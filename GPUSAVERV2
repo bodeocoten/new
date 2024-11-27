@@ -1,0 +1,46 @@
+if game.PlaceId == 15860930970 then
+    wait(30)
+    print("GPU SAVER")
+    local rs = game:GetService("RunService")
+    local coreGui = game:GetService("CoreGui")
+    
+    -- Fungsi untuk menambahkan overlay hitam penuh ke layar
+    local function addFullBlackScreen()
+        -- Cek apakah overlay sudah ada
+        if not coreGui:FindFirstChild("BlackOverlay") then
+            -- Buat overlay hitam
+            local screenGui = Instance.new("ScreenGui")
+            screenGui.Name = "BlackOverlay"
+            screenGui.ResetOnSpawn = false
+            screenGui.IgnoreGuiInset = true  -- Pastikan tidak ada elemen lain yang terlihat
+            screenGui.DisplayOrder = 10000  -- Sangat tinggi untuk memastikan lapisan atas
+    
+            -- Buat frame hitam yang menutupi seluruh layar
+            local blackFrame = Instance.new("Frame")
+            blackFrame.Size = UDim2.new(1, 0, 1, 0)  -- Menutupi layar penuh
+            blackFrame.Position = UDim2.new(0, 0, 0, 0)
+            blackFrame.BackgroundColor3 = Color3.new(0, 0, 0)  -- Warna hitam
+            blackFrame.BackgroundTransparency = 0  -- Tanpa transparansi
+            blackFrame.BorderSizePixel = 0  -- Hilangkan border
+            blackFrame.ZIndex = 10000  -- Pastikan frame hitam berada di lapisan tertinggi
+            blackFrame.Parent = screenGui
+    
+            -- Menempatkan ScreenGui di dalam CoreGui untuk prioritas tertinggi
+            screenGui.Parent = coreGui
+        end
+    end
+    
+    -- Nonaktifkan rendering 3D untuk mengurangi beban GPU
+    rs:Set3dRenderingEnabled(false)
+    
+    -- Menambahkan overlay hitam penuh ke layar
+    addFullBlackScreen()
+    
+    -- Mengaktifkan throttle untuk membatasi framerate
+    rs:SetThrottleFramerateEnabled(true)
+
+    print("Game ID cocok, script dijalankan.")
+else
+    -- Script ini hanya dijalankan jika game ID tidak cocok
+    print("Game ID tidak cocok, script tidak dijalankan.")
+end

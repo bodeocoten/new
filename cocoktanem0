@@ -1,0 +1,147 @@
+print("RUN RUN GO")
+-- Konfigurasi
+wait(15)
+local petName = "Freddy"
+local waitTimeTeleport = 2
+local waitTimeBetweenTeleports = 2
+local waitTimeBetweenLoops = 1
+local loopCount = 8
+local targetWaves = { "Wave 0/15", "Wave 1/15", "Wave 2/15" }
+local stopWave = "Wave 15/15"
+local targetMoney = 400 -- Ubah jumlah target money sesuai kebutuhan
+local PlacementMaxCap = 8 -- Kapasitas maksimum unit yang bisa dipasang
+
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local Money = Player:WaitForChild("Money")
+local PathWaveDetection = Player.PlayerGui.Top.Wave
+local TowersFolder = workspace:WaitForChild("Towers")
+local executedWaves = {}
+local stopLoop = false
+local scriptExecuted = false -- Variabel untuk memastikan script hanya berjalan sekali
+
+-- Fungsi untuk menghitung jumlah unit yang telah ditempatkan
+local function countPlacedUnits(unitName)
+    local count = 0
+    for _, tower in pairs(TowersFolder:GetChildren()) do
+        if tower.Name == unitName and tower:IsA("Model") then
+            count = count + 1
+        end
+    end
+    return count
+end
+
+-- Fungsi untuk menghitung midpoint dengan logika dari Kumpulan Script Koordinat
+local function calculateAdjustedMidpoint(parts, offset)
+    local midpoint1 = (parts[1].Position + parts[2].Position) / 2
+    local midpoint2 = (parts[3].Position + parts[4].Position) / 2
+    return ((midpoint1 + midpoint2) / 2) + offset
+end
+
+-- Fungsi teleportasi dan summon pet
+local function teleportAndSummon(parts, offset)
+    if stopLoop then return end
+
+    local currentPlacementCount = countPlacedUnits(petName)
+    if currentPlacementCount >= PlacementMaxCap then
+        stopLoop = true
+        print("Script dihentikan karena kapasitas maksimum unit tercapai.")
+        
+        -- Eksekusi loadstring jika kapasitas maksimum tercapai
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/LocasTheBoys/efenprojekmatiktuga/refs/heads/main/0"))()
+        
+        return
+    end
+
+    local character = Player.Character or Player.CharacterAdded:Wait()
+    local adjustedPosition = calculateAdjustedMidpoint(parts, offset)
+    character.HumanoidRootPart.CFrame = CFrame.new(adjustedPosition)
+
+    task.wait(waitTimeTeleport)
+
+    local argsReset = { [1] = "Reset" }
+    game:GetService("ReplicatedStorage").Remotes.Misc.StopSettings:FireServer(unpack(argsReset))
+
+    for i = 1, 68 do
+        game:GetService("ReplicatedStorage").Remotes.Misc.StopSettings:FireServer()
+    end
+
+    local humanoidRootPartCFrame = character.HumanoidRootPart.CFrame
+    local argsSummon = { [1] = petName, [2] = humanoidRootPartCFrame }
+    game:GetService("ReplicatedStorage").Remotes.Towers.SummonTower:FireServer(unpack(argsSummon))
+end
+
+-- Fungsi utama untuk memulai summon
+local function startSummoning()
+    if scriptExecuted then return end
+    scriptExecuted = true -- Tandai bahwa script sudah berjalan
+
+    for i = 1, loopCount do
+        if stopLoop then break end
+
+        -- Posisi 1
+        local parts1 = {
+          workspace.Map:WaitForChild("Paths"):WaitForChild("1"):WaitForChild("Start"),
+          workspace.Map:WaitForChild("Paths"):WaitForChild("1"):WaitForChild("1"),
+          workspace.Map:WaitForChild("Paths"):WaitForChild("1"):WaitForChild("2"),
+          workspace.Map:WaitForChild("Paths"):WaitForChild("1"):WaitForChild("3")
+        }
+        teleportAndSummon(parts1, Vector3.new(19, 0, -20)) -- Offset untuk Posisi 1
+        task.wait(waitTimeBetweenTeleports)
+
+        -- Posisi 2
+        teleportAndSummon(parts1, Vector3.new(13, 0, -20)) -- Offset untuk Posisi 2
+        task.wait(waitTimeBetweenTeleports)
+
+        -- Posisi 3
+        teleportAndSummon(parts1, Vector3.new(8, 0, -20)) -- Offset untuk Posisi 3
+        task.wait(waitTimeBetweenTeleports)
+
+        -- Posisi 4
+        teleportAndSummon(parts1, Vector3.new(0, 0, -20)) -- Offset untuk Posisi 4
+        task.wait(waitTimeBetweenTeleports)
+
+        -- Posisi 5
+        teleportAndSummon(parts1, Vector3.new(0, 0, -31)) -- Offset untuk Posisi 5
+        task.wait(waitTimeBetweenTeleports)
+
+        -- Posisi 6
+        teleportAndSummon(parts1, Vector3.new(8, 0, -31)) -- Offset untuk Posisi 6
+        task.wait(waitTimeBetweenTeleports)
+
+        -- Posisi 7
+        teleportAndSummon(parts1, Vector3.new(13, 0, -31)) -- Offset untuk Posisi 7
+        task.wait(waitTimeBetweenTeleports)
+
+        -- Posisi 8
+        teleportAndSummon(parts1, Vector3.new(19, 0, -31)) -- Offset untuk Posisi 8
+        task.wait(waitTimeBetweenTeleports)
+
+        task.wait(waitTimeBetweenLoops)
+    end
+end
+
+-- Listener untuk mendeteksi perubahan teks di PathWaveDetection
+PathWaveDetection:GetPropertyChangedSignal("Text"):Connect(function()
+    if scriptExecuted then return end
+    local waveText = PathWaveDetection.Text
+    if waveText == stopWave then
+        stopLoop = true
+        print("Loop dihentikan karena mencapai " .. stopWave)
+        return
+    end
+
+    if table.find(targetWaves, waveText) and not executedWaves[waveText] then
+        executedWaves[waveText] = true
+        print("Target wave tercapai: " .. waveText)
+        startSummoning()
+    end
+end)
+
+-- Listener untuk mendeteksi perubahan nilai Money
+Money:GetPropertyChangedSignal("Value"):Connect(function()
+    if Money.Value >= targetMoney and not scriptExecuted then
+        print("Jumlah money tercapai: " .. Money.Value)
+        startSummoning()
+    end
+end)

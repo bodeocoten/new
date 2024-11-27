@@ -1,0 +1,28 @@
+-- Konfigurasi Enchant
+local enchantConfig = {
+    {"Damage1", false},  -- Nonaktif
+    {"Damage2", false},   -- Nonaktif
+    {"Damage3", false},  -- Nonaktif
+    {"Range1", false},    -- Nonaktif
+    {"Range2", false},   -- Nonaktif
+    {"Range3", false},    -- Nonaktif
+    {"Speed1", false},   -- Nonaktif
+    {"Speed2", false},    -- Nonaktif
+    {"Speed3", false},   -- Nonaktif
+    {"BossKiller", false}, -- Nonaktif
+    {"Withered", false}   -- Nonaktif
+}
+
+-- Fungsi untuk memanggil Remote
+local function autoSkipEnchant(enchant)
+    local args = {
+        [1] = enchant[1],
+        [2] = enchant[2]
+    }
+    game:GetService("ReplicatedStorage").Remotes.Misc.AutoSkipEnchant:FireServer(unpack(args))
+end
+
+-- Menjalankan semua enchant dari konfigurasi
+for _, enchant in ipairs(enchantConfig) do
+    autoSkipEnchant(enchant)
+end

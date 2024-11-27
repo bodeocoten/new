@@ -1,0 +1,120 @@
+wait(10)
+-- Konfigurasi Loadstring
+local loadstringUrl = "https://raw.githubusercontent.com/LocasTheBoys/efentedeh/refs/heads/main/BuyAndOpen" -- Ganti dengan link script Anda
+
+-- Membuat GUI
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local CloseButton = Instance.new("TextButton")
+local ActionButton = Instance.new("TextButton")
+local Indicator = Instance.new("Frame")
+local MinimizeIcon = Instance.new("TextButton")
+local StatusText = Instance.new("TextLabel")
+
+-- Pengaturan Frame
+Frame.Parent = ScreenGui
+Frame.Size = UDim2.new(0.15, 0, 0.3, 0) -- Ukuran frame lebih kecil
+Frame.Position = UDim2.new(0.425, 0, 0.35, 0) -- Posisi frame ditengah
+Frame.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+
+-- Pengaturan Close Button dengan simbol X
+CloseButton.Parent = Frame
+CloseButton.Size = UDim2.new(0.1, 0, 0.1, 0)
+CloseButton.Position = UDim2.new(0.9, 0, 0, 0)
+CloseButton.Text = "✖" -- Simbol X
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+CloseButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+-- Pengaturan Action Button
+ActionButton.Parent = Frame
+ActionButton.Size = UDim2.new(0.5, 0, 0.1, 0)
+ActionButton.Position = UDim2.new(0.25, 0, 0.5, 0)
+ActionButton.Text = "Perform Action"
+ActionButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+
+-- Pengaturan Indicator
+Indicator.Parent = Frame
+Indicator.Size = UDim2.new(1, 0, 0.1, 0)
+Indicator.Position = UDim2.new(0, 0, 0.7, 0)
+Indicator.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+Indicator.Visible = false
+
+-- Pengaturan Status Text
+StatusText.Parent = Indicator -- Pindahkan StatusText ke dalam Indicator
+StatusText.Size = UDim2.new(1, 0, 1, 0) -- Ukuran mengikuti Indicator
+StatusText.Position = UDim2.new(0, 0, 0, 0) -- Posisi di dalam Indicator
+StatusText.Text = "Script Executed"
+StatusText.BackgroundTransparency = 1
+StatusText.TextColor3 = Color3.fromRGB(0, 0, 0) -- Ubah warna teks menjadi hitam
+StatusText.TextScaled = true
+
+-- Fungsi untuk menyalakan indikator dan menampilkan teks
+local function activateIndicator()
+    Indicator.Visible = true
+    wait(0.2) -- Durasi indikator menyala
+    Indicator.Visible = false
+end
+
+-- Event saat tombol ditekan
+ActionButton.MouseButton1Click:Connect(function()
+    activateIndicator()
+    
+    -- Menampilkan pesan di konsol
+    print("Script has been executed") 
+
+    -- Eksekusi loadstring jika diperlukan
+    local success, err = pcall(function()
+        return loadstring(game:HttpGet(loadstringUrl))()
+    end)
+    
+    if not success then
+        warn("Error loading script: " .. err)
+    end
+end)
+
+-- Pengaturan Minimize Icon
+MinimizeIcon.Parent = ScreenGui
+MinimizeIcon.Size = UDim2.new(0, 30, 0, 30)
+MinimizeIcon.Position = UDim2.new(0, 0, 0.5, 0) -- Posisi di kiri tengah
+MinimizeIcon.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+MinimizeIcon.Text = ":red_circle:" -- Ikon lingkaran merah
+MinimizeIcon.TextScaled = true
+MinimizeIcon.MouseButton1Click:Connect(function()
+    if Frame.Visible then
+        Frame.Visible = false
+    else
+        Frame.Visible = true
+    end
+end)
+
+-- Membuat dragable GUI
+local dragging
+local dragInput
+local dragStart
+local startPos
+
+Frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = Frame.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+Frame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement and dragging then
+        local delta = input.Position - dragStart
+        Frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- Menampilkan GUI
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")

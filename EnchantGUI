@@ -1,0 +1,101 @@
+wait(2)
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local CloseButton = Instance.new("TextButton")
+local TPButton = Instance.new("TextButton")
+local OnButton = Instance.new("TextButton")
+local OffButton = Instance.new("TextButton")
+
+-- Mengatur properti ScreenGui
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Mengatur properti Frame
+Frame.Parent = ScreenGui
+Frame.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+Frame.Size = UDim2.new(0, 300, 0, 200)
+Frame.Position = UDim2.new(0.5, -150, 0.5, -100)
+Frame.AnchorPoint = Vector2.new(0.5, 0.5)
+
+-- Mengatur properti CloseButton
+CloseButton.Parent = Frame
+CloseButton.BackgroundColor3 = Color3.new(1, 0, 0)
+CloseButton.Size = UDim2.new(0, 30, 0, 30)
+CloseButton.Position = UDim2.new(1, -40, 0, 10)
+CloseButton.Text = "X"
+CloseButton.TextColor3 = Color3.new(1, 1, 1)
+
+-- Mengatur properti TPButton
+TPButton.Parent = Frame
+TPButton.BackgroundColor3 = Color3.new(0.3, 0.3, 0.3)
+TPButton.Size = UDim2.new(0, 200, 0, 50)
+TPButton.Position = UDim2.new(0.5, -100, 0, 10)
+TPButton.Text = "TP Enchant"
+TPButton.TextColor3 = Color3.new(1, 1, 1)
+
+-- Mengatur properti OnButton
+OnButton.Parent = Frame
+OnButton.BackgroundColor3 = Color3.new(0, 1, 0)
+OnButton.Size = UDim2.new(0, 200, 0, 50)
+OnButton.Position = UDim2.new(0.5, -100, 0, 70)
+OnButton.Text = "ON True"
+OnButton.TextColor3 = Color3.new(1, 1, 1)
+
+-- Mengatur properti OffButton
+OffButton.Parent = Frame
+OffButton.BackgroundColor3 = Color3.new(1, 0, 0)
+OffButton.Size = UDim2.new(0, 200, 0, 50)
+OffButton.Position = UDim2.new(0.5, -100, 0, 130)
+OffButton.Text = "OFF False"
+OffButton.TextColor3 = Color3.new(1, 1, 1)
+
+-- Variabel untuk drag
+local dragging = false
+local dragInput
+local dragStart
+local startPos
+
+-- Fungsi untuk mulai dragging
+Frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = Frame.Position
+        
+        -- Menyambungkan event untuk mendeteksi jika dragging berhenti
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+-- Fungsi untuk dragging
+Frame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        if dragging then
+            local delta = input.Position - dragStart
+            Frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end
+end)
+
+-- Fungsi untuk menutup GUI
+CloseButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+-- Fungsi untuk tombol TP Enchant
+TPButton.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/LocasTheBoys/efentedeh/refs/heads/main/TPEnchant"))()
+end)
+
+-- Fungsi untuk tombol ON True
+OnButton.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/LocasTheBoys/efentedeh/refs/heads/main/EnchantOn"))()
+end)
+
+-- Fungsi untuk tombol OFF False
+OffButton.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/LocasTheBoys/efentedeh/refs/heads/main/EnchantOff"))()
+end)

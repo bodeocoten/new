@@ -1,0 +1,9 @@
+-- Daily Claim (Loop frm 1 to 7)
+for i = 1, 7 do
+    local args = {
+        [1] = i -- Cycles through 1 to 7
+    }
+
+    game:GetService("ReplicatedStorage").Remotes.Misc.Daily:FireServer(unpack(args))
+    wait(1) -- Optional delay between each claim, adjust if necessary
+end

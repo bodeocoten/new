@@ -1,0 +1,20 @@
+--print("VPS") kotak
+print("Full Script Is Running")
+local function executeScripts(scripts)
+    for _, script in ipairs(scripts) do
+        local co = coroutine.create(function()
+            loadstring(game:HttpGet(script))()
+        end)
+        coroutine.resume(co)
+    end
+end
+x
+local scripts = {
+    "https://raw.githubusercontent.com/LocasTheBoys/efentedeh/refs/heads/main/AutoJoin",x
+    "https://raw.githubusercontent.com/LocasTheBoys/efentedeh/refs/heads/main/Claim",x
+    "https://raw.githubusercontent.com/LocasTheBoys/efentedeh/refs/heads/main/PlaceDetection3",x
+    "https://raw.githubusercontent.com/LocasTheBoys/selah/main/AntiDC",
+    "https://raw.githubusercontent.com/LocasTheBoys/TheBoyss/main/FPSCAP"
+}
+
+executeScripts(scripts)

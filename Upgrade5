@@ -1,0 +1,27 @@
+-- Script Upgrade
+wait(60) --4.1 wait must 30 ini wait lama 5.1
+while true do
+    local allUpgradableUnits = {}
+    for _, unit in pairs(workspace.Towers:GetChildren()) do
+        if unit.Name == "Funtime Freddy" then
+            local primaryPart = unit:FindFirstChildWhichIsA("BasePart")
+            if primaryPart then
+                table.insert(allUpgradableUnits, unit)
+            end
+        end
+    end
+    if #allUpgradableUnits > 0 then
+        for _, unit in ipairs(allUpgradableUnits) do
+            local upgradeArgs = {
+                [1] = unit
+            }
+            local success, err = pcall(function()
+                game:GetService("ReplicatedStorage").Remotes.Towers.Upgrade:FireServer(unpack(upgradeArgs))
+            end)
+            if not success then
+                warn("Upgrade failed for unit: " .. unit.Name .. " with error: " .. err)
+            end
+        end
+    end
+    wait(5)
+end

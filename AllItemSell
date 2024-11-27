@@ -1,0 +1,31 @@
+-- List of items to sell with their corresponding quantities
+wait(2)
+local itemsToSell = {
+    {name = "Pizza", quantity = 10000},
+    {name = "Soul", quantity = 10000},
+    {name = "OldTV", quantity = 10000},
+    {name = "Flashlight", quantity = 10000},
+    {name = "EternalGlass", quantity = 0},
+    {name = "GoldenLock", quantity = 10000},
+    {name = "Agony", quantity = 10000}, -- Tengkorak 30 souls
+    {name = "UncommonRemnant", quantity = 10000}, -- Bola Bola Shiny Hijau
+    {name = "RareRemnant", quantity = 10000}, -- Bola Bola Shiny biru
+    {name = "EpicRemnant", quantity = 10000}, -- Bola Bola Shiny ungu
+    {name = "MythicRemnant", quantity = 10000}, -- Bola Bola Shiny kuning
+    {name = "SecretRemnant", quantity = 10000} -- Bola Bola Shiny Red
+}
+
+-- Function to auto-sell items
+local function autoSell(items)
+    for _, item in pairs(items) do
+        local args = {
+            [1] = item.name,
+            [2] = item.quantity
+        }
+        game:GetService("ReplicatedStorage").Remotes.Misc.Salvage:FireServer(unpack(args))
+        wait(3) -- Adding a small delay to avoid flooding the server
+    end
+end
+
+-- Execute the auto-sell function
+autoSell(itemsToSell)

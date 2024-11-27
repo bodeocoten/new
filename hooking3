@@ -1,0 +1,104 @@
+wait(3)
+-- Masukkan webhook URL di sini untuk memudahkan penggantian
+local webhookUrl = 'https://discord.com/api/webhooks/1294985410333642822/mZBFRJ9SR71FvKFzQONHmHAmc624Gk3JvgTxDxZSBONH6qt4twJxLELH5A_BUx4ohmpL'
+
+-- Periksa apakah game ID cocok
+if game.PlaceId == 15860930970 then
+    print("Game ID cocok, script dijalankan.")
+    
+    wait(1)  -- Tunggu 1 detik sebelum mulai
+    wait(3)
+
+    local Players = game:GetService("Players")
+    local Player = Players.LocalPlayer
+
+    -- Simpan waktu awal saat script dieksekusi
+    local startTime = os.time()
+
+    -- Fungsi untuk mengirimkan informasi ke webhook Discord
+    local function sendToWebhook(content, executionTime)
+        local Time = os.date('!*t', os.time())
+        
+        -- Embed yang sudah dimodifikasi sesuai dengan format yang diinginkan
+        local Embed = {
+            -- FNTD GACOR HUB sebagai nama author dengan bold
+            author = {
+                name = '**( FNTD GACOR HUB )**';  -- Bold untuk FNTD GACOR HUB
+            };
+            fields = {
+                -- Nama player dalam format yang diminta
+                {
+                    name = '**Name**';  -- Bold untuk Name
+                    value = '||' .. Player.Name .. '||';  -- LocalPlayer dalam format ||LocalPlayer||
+                },
+                -- Hasil game dalam format yang diminta
+                {
+                    name = '**Result**';  -- Bold untuk Result
+                    value = content;  -- Isi result, apakah player Lost atau Won
+                },
+                -- Tambahkan waktu eksekusi
+                {
+                    name = '**Time**';  -- Bold untuk Time
+                    value = executionTime;  -- Waktu dari eksekusi pertama hingga GUI ditemukan
+                }
+            };
+            -- Ubah warna embed sesuai permintaan
+            color = 16743442;  -- Warna yang diinginkan
+            -- Timestamp format untuk tampilkan waktu sekarang
+            timestamp = string.format('%d-%d-%dT%02d:%02d:%02dZ', Time.year, Time.month, Time.day, Time.hour, Time.min, Time.sec);
+        }
+        
+        -- Permintaan webhook ke Discord
+        (syn and syn.request or http_request) {
+            Url = webhookUrl;  -- URL webhook diambil dari variabel paling atas
+            Method = 'POST';
+            Headers = {
+                ['Content-Type'] = 'application/json';
+            };
+            Body = game:GetService('HttpService'):JSONEncode({ embeds = { Embed } });
+        }
+    end
+
+    -- Fungsi untuk mendeteksi apakah Lost atau Won muncul
+    local function detectLostOrWon()
+        local CompletedFolder = Player.PlayerGui:WaitForChild("Completed")
+        local LostGui = CompletedFolder:FindFirstChild("Lost")
+        local WonGui = CompletedFolder:FindFirstChild("Won")
+        
+        if LostGui and LostGui.Visible then
+            local result = "Player Is Lost"  -- Output yang benar sesuai dengan deteksi Lost
+            print(result)
+            
+            -- Hitung waktu yang telah berlalu dari eksekusi pertama
+            local executionDuration = os.difftime(os.time(), startTime)
+            local executionTime = os.date("!%X", executionDuration)  -- Format HH:MM:SS
+
+            sendToWebhook(result, executionTime)  -- Kirim ke webhook dengan hasil Player Is Lost
+            return true  -- Menandakan Lost GUI telah ditemukan
+        elseif WonGui and WonGui.Visible then
+            local result = "Player Is Won"  -- Output yang benar sesuai dengan deteksi Won
+            print(result)
+            
+            -- Hitung waktu yang telah berlalu dari eksekusi pertama
+            local executionDuration = os.difftime(os.time(), startTime)
+            local executionTime = os.date("!%X", executionDuration)  -- Format HH:MM:SS
+            
+            sendToWebhook(result, executionTime)  -- Kirim ke webhook dengan hasil Player Is Won
+            return true  -- Menandakan Won GUI telah ditemukan
+        else
+            return false  -- Tidak ada GUI yang ditemukan
+        end
+    end
+
+    -- Loop untuk terus mengecek sampai Lost atau Won GUI ditemukan
+    while true do
+        task.wait(1)  -- Menunggu 1 detik sebelum pengecekan ulang
+        local found = detectLostOrWon()  -- Cek apakah Lost atau Won ditemukan
+        if found then
+            break  -- Keluar dari loop jika salah satu GUI terdeteksi
+        end
+    end
+else
+    -- Script ini hanya dijalankan jika game ID tidak cocok
+    print("Game ID tidak cocok, script tidak dijalankan.")
+end

@@ -1,0 +1,10 @@
+-- SeasonPass Claim (Loop from 1 to 30)
+for i = 1, 30 do
+    local args = {
+        [1] = i, -- Cycles through 1 to 30
+        [2] = "Normal" -- Always set to "Normal"
+    }
+
+    game:GetService("ReplicatedStorage").Remotes.SeasonPass.Claim:FireServer(unpack(args))
+    wait(1) -- Optional delay between claims, adjust as needed
+end

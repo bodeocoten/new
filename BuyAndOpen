@@ -1,0 +1,26 @@
+-- Konfigurasi Utama Auto Buy And Open Present
+local delayBuyPresent = 1        -- Delay untuk beli present
+local delayOpenPresent = 2       -- Delay untuk membuka present
+local numberOfPresents = 1       -- Jumlah present yang ingin dibeli
+local presentName = "Corrupted" -- Nama present yang akan dibuka
+local openQuantity = 1           -- Jumlah present yang akan dibuka per kali (jangan dirubah jika belum mengecheck remote)
+local numberOfOpensPerPresent = 1 -- Jumlah loop untuk membuka present (total present yang ingin dibuka)
+
+-- Rangkaian Proses Utama
+for i = 1, numberOfPresents do
+    -- Fungsi Auto Beli Present
+    game:GetService("ReplicatedStorage").Remotes.Misc.EventPassTouch.Pack2:FireServer()
+    print("Present ke-" .. i .. " dibeli.")
+    wait(delayBuyPresent)    -- Tunggu sebelum melanjutkan ke proses berikutnya
+
+    -- Fungsi Auto Open Present
+    for j = 1, numberOfOpensPerPresent do  -- Loop untuk membuka beberapa present per iterasi
+        local args = {
+            [1] = presentName,
+            [2] = openQuantity
+        }
+        game:GetService("ReplicatedStorage").Remotes.Misc.OpenPresent:FireServer(unpack(args))
+        print("Present ke-" .. i .. ", buka ke-" .. j .. " dibuka.")
+        wait(delayOpenPresent)   -- Tunggu sebelum membuka present berikutnya
+    end
+end

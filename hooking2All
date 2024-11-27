@@ -1,0 +1,175 @@
+wait(3)
+-- Masukkan webhook URL di sini untuk memudahkan penggantian VPS 2
+local webhookUrl = 'https://discord.com/api/webhooks/1224377074895294627/s7HjVGI8HInt7Vd84ebr-NyRAH4fT4I_98y_T0jDnnX-ElSk7SX6XE1ujM9sqw5r90dN'
+
+-- Periksa apakah game ID cocok
+if game.PlaceId == 15860930970 then
+    print("Game ID cocok, script dijalankan.")
+    
+    wait(3)  -- Tunggu 3 detik sebelum mulai
+
+    local Players = game:GetService("Players")
+    local Player = Players.LocalPlayer
+    local PathWaveDetection = Player.PlayerGui.Top.Wave
+
+    -- Simpan waktu awal saat script dieksekusi
+    local startTime = os.time()
+
+    -- List asset ID untuk item yang dideteksi
+    local itemList = {
+        ["Coins"] = "rbxassetid://16777953884",
+        ["Event Coins"] = "rbxassetid://107361664274197",
+        ["Flashlight"] = "rbxassetid://133377596734432",
+        ["Pizza"] = "rbxassetid://138130971515753",
+        ["Soul"] = "rbxassetid://113741147309700",
+        ["Old TV"] = "rbxassetid://79903371300338",
+        ["Eternal Glass"] = "rbxassetid://138091177867527",
+        ["Golden Lock"] = "rbxassetid://74649146853807",
+        ["Agony"] = "rbxassetid://80223070079492",
+        ["Uncommon Remnant"] = "rbxassetid://17645435518",
+        ["Rare Remnant"] = "rbxassetid://17645357275",
+        ["Epic Remnant"] = "rbxassetid://17628866369",
+        ["Mythic Remnant"] = "rbxassetid://17645359361",
+        ["Secret Remnant"] = "rbxassetid://17645427747",
+        ["Souls"] = "rbxassetid://17758801602",
+        ["Corrupted Present"] = "rbxassetid://101695651387234",
+        ["Scarecrow Foxy Present"] = "rbxassetid://125180390639507"
+    }
+
+    -- Fungsi untuk mengirimkan informasi ke webhook Discord
+    local function sendToWebhook(content, executionTime, items, wave)
+        local Time = os.date('!*t', os.time())
+        
+        local Embed = {
+            author = {
+                name = '**( FNTD GACOR HUB )**';  -- Bold untuk FNTD GACOR HUB
+            };
+            fields = {
+                {
+                    name = '**Name**';  -- Bold untuk Name
+                    value = '||' .. Player.Name .. '||';
+                },
+                {
+                    name = '**Result**';  -- Bold untuk Result
+                    value = content;
+                },
+                {
+                    name = '**Wave**';  -- Bold untuk Wave
+                    value = wave;
+                },
+                {
+                    name = '**Time**';  -- Bold untuk Time
+                    value = executionTime;
+                },
+                {
+                    name = '**Items**';  -- Bold untuk Items
+                    value = table.concat(items, '\n');  -- Menampilkan semua item yang terdeteksi
+                }
+            };
+            color = 16743442;
+            timestamp = string.format('%d-%d-%dT%02d:%02d:%02dZ', Time.year, Time.month, Time.day, Time.hour, Time.min, Time.sec);
+        }
+        
+        (syn and syn.request or http_request) {
+            Url = webhookUrl;
+            Method = 'POST';
+            Headers = {
+                ['Content-Type'] = 'application/json';
+            };
+            Body = game:GetService('HttpService'):JSONEncode({ embeds = { Embed } });
+        }
+    end
+
+    -- Fungsi untuk mendeteksi item di dalam GUI Rewards
+    local function detectItems(rewardFolder)
+        local detectedItems = {}
+
+        for _, example in ipairs(rewardFolder:GetChildren()) do
+            local itemImage = example:FindFirstChild("ItemImage")
+            local amount = example:FindFirstChild("Amount")
+            
+            if itemImage and amount then
+                for itemName, assetID in pairs(itemList) do
+                    if itemImage.Image == assetID then
+                        local itemCount = amount.Text:gsub("x", "")  -- Hapus prefix "x"
+                        table.insert(detectedItems, itemName .. ": " .. itemCount)
+                    end
+                end
+            end
+        end
+
+        return detectedItems
+    end
+
+    -- Fungsi untuk mendeteksi apakah Lost atau Won muncul dan memproses item
+    local function detectLostOrWon()
+        local CompletedFolder = Player.PlayerGui:WaitForChild("Completed")
+        local LostGui = CompletedFolder:FindFirstChild("Lost")
+        local WonGui = CompletedFolder:FindFirstChild("Won")
+        
+        -- Dapatkan teks wave saat ini
+        local currentWave = PathWaveDetection.Text
+
+        if LostGui and LostGui.Visible then
+            local result = "Player Is Lost"
+            print(result)
+
+            local detectedItems = detectItems(LostGui.Rewards)
+            if #detectedItems > 0 then
+                local executionDuration = os.difftime(os.time(), startTime)
+                local executionTime = os.date("!%X", executionDuration)
+                sendToWebhook(result, executionTime, detectedItems, currentWave)
+            end
+            return true
+        elseif WonGui and WonGui.Visible then
+            local result = "Player Is Won"
+            print(result)
+
+            local detectedItems = detectItems(WonGui.Rewards)
+            if #detectedItems > 0 then
+                local executionDuration = os.difftime(os.time(), startTime)
+                local executionTime = os.date("!%X", executionDuration)
+                sendToWebhook(result, executionTime, detectedItems, currentWave)
+            end
+            return true
+        else
+            return false
+        end
+    end
+
+    -- Gunakan GetPropertyChangedSignal untuk mendeteksi perubahan status secara langsung
+    local function setupInstantDetection()
+        local CompletedFolder = Player.PlayerGui:WaitForChild("Completed")
+        local LostGui = CompletedFolder:WaitForChild("Lost")
+        local WonGui = CompletedFolder:WaitForChild("Won")
+
+        -- Menggunakan GetPropertyChangedSignal untuk mendeteksi perubahan status
+        LostGui:GetPropertyChangedSignal("Visible"):Connect(function()
+            if LostGui.Visible then
+                local detectedItems = detectItems(LostGui.Rewards)
+                if #detectedItems > 0 then
+                    local executionDuration = os.difftime(os.time(), startTime)
+                    local executionTime = os.date("!%X", executionDuration)
+                    sendToWebhook("Player Is Lost", executionTime, detectedItems, PathWaveDetection.Text)
+                end
+            end
+        end)
+
+        WonGui:GetPropertyChangedSignal("Visible"):Connect(function()
+            if WonGui.Visible then
+                local detectedItems = detectItems(WonGui.Rewards)
+                if #detectedItems > 0 then
+                    local executionDuration = os.difftime(os.time(), startTime)
+                    local executionTime = os.date("!%X", executionDuration)
+                    sendToWebhook("Player Is Won", executionTime, detectedItems, PathWaveDetection.Text)
+                end
+            end
+        end)
+    end
+
+    -- Set up instant detection
+    setupInstantDetection()
+
+else
+    print("Game ID tidak cocok, script tidak dijalankan.")
+end

@@ -1,0 +1,53 @@
+-- CONFIG
+local delayAfterResult = 1 -- Delay dalam detik setelah Lost atau Won terdeteksi
+
+-- Auto PLAY AGAIN YES
+local Players = game:GetService("Players")
+
+-- Fungsi untuk mendeteksi apakah Lost atau Won muncul
+local function detectLostOrWon()
+    local Player = Players.LocalPlayer
+    local CompletedFolder = Player.PlayerGui:WaitForChild("Completed")
+    local LostGui = CompletedFolder:FindFirstChild("Lost")
+    local WonGui = CompletedFolder:FindFirstChild("Won")
+
+    if LostGui and LostGui.Visible then
+        print("Player Is Lost")
+        return true
+    elseif WonGui and WonGui.Visible then
+        print("Player Is Won")
+        return true
+    else
+        return false
+    end
+end
+
+-- Script utama
+local function autoPlayAgain()
+    local Player = Players.LocalPlayer
+    local PathToYesButton = Player.PlayerGui.Completed.PlayAgain.Yes
+    local Connections = {"Activated", "MouseButton1Click", "MouseButton1Down"}
+
+    for _, connectionType in next, Connections do
+        if PathToYesButton[connectionType] then
+            for _, conn in next, getconnections(PathToYesButton[connectionType]) do
+                conn:Fire()
+            end
+        end
+    end
+
+    print("Auto Play Again executed successfully!")
+end
+
+-- Loop untuk mendeteksi Lost atau Won, lalu jalankan Script 1 dengan delay
+while true do
+    task.wait(1) -- Interval pengecekan
+    local resultDetected = detectLostOrWon()
+
+    if resultDetected then
+        print("Result detected, waiting for configured delay...")
+        task.wait(delayAfterResult)
+        autoPlayAgain()
+        break -- Keluar setelah Script 1 dijalankan
+    end
+end

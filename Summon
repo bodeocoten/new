@@ -1,0 +1,5 @@
+local args = {
+    [1] = 1 -- 1 or 10
+}
+
+game:GetService("ReplicatedStorage").Remotes.Summons.Hatch:InvokeServer(unpack(args))

@@ -1,0 +1,64 @@
+-- Auto Join Game
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- Koordinat target untuk Opsi 1 dan Opsi 2
+local targetPosition1 = Vector3.new(-953.38, 245.07, -94.70)
+local targetPosition2 = Vector3.new(-1146.24, 245.07, -43.24)
+
+-- Lokasi teleportasi untuk Opsi 1
+local teleportPosition1_1 = CFrame.new(-953.98, 245.01, -71.20)
+local teleportPosition1_2 = CFrame.new(-953.73, 245.07, -83.88)
+
+-- Lokasi teleportasi untuk Opsi 2
+local teleportPosition2_1 = CFrame.new(-1145.33, 245.01, -62.58)
+local teleportPosition2_2 = CFrame.new(-1145.64, 245.07, -54.63)
+
+-- Cek apakah pemain berada di game dengan ID tertentu
+if game.PlaceId == 15846919378 then
+    while true do
+        -- Pastikan karakter sudah ada dan HumanoidRootPart valid
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            -- Dapatkan posisi pemain
+            local playerPosition = LocalPlayer.Character.HumanoidRootPart.Position
+            
+            -- Debug: Tampilkan posisi pemain
+            print("Posisi Pemain:", playerPosition)
+
+            -- Periksa apakah pemain sudah berada di target Opsi 1 atau Opsi 2
+            if (playerPosition - targetPosition1).magnitude <= 1 or (playerPosition - targetPosition2).magnitude <= 1 then
+                print("Pemain sudah mencapai salah satu target, keluar dari loop.")
+                break -- Keluar dari loop
+            end
+
+            -- Jika tidak berada di salah satu target, eksekusi teleportasi Opsi 1
+            LocalPlayer.Character.HumanoidRootPart.CFrame = teleportPosition1_1
+            wait(1)  -- Tunggu 1 detik
+            LocalPlayer.Character.HumanoidRootPart.CFrame = teleportPosition1_2
+            wait(1)  -- Tunggu 1 detik
+            
+            -- Setelah teleportasi Opsi 1, periksa kembali posisi pemain
+            playerPosition = LocalPlayer.Character.HumanoidRootPart.Position
+            if (playerPosition - targetPosition1).magnitude <= 1 or (playerPosition - targetPosition2).magnitude <= 1 then
+                print("Pemain sudah mencapai salah satu target setelah Opsi 1, keluar dari loop.")
+                break -- Keluar dari loop
+            end
+
+            -- Eksekusi teleportasi Opsi 2
+            LocalPlayer.Character.HumanoidRootPart.CFrame = teleportPosition2_1
+            wait(1)  -- Tunggu 1 detik
+            LocalPlayer.Character.HumanoidRootPart.CFrame = teleportPosition2_2
+            wait(1)  -- Tunggu 1 detik
+
+            -- Setelah teleportasi Opsi 2, periksa kembali posisi pemain
+            playerPosition = LocalPlayer.Character.HumanoidRootPart.Position
+            if (playerPosition - targetPosition1).magnitude <= 1 or (playerPosition - targetPosition2).magnitude <= 1 then
+                print("Pemain sudah mencapai salah satu target setelah Opsi 2, keluar dari loop.")
+                break -- Keluar dari loop
+            end
+        end
+
+        -- Tunggu sejenak sebelum memeriksa lagi
+        wait(0.5)  -- Tunggu 0.5 detik sebelum iterasi berikutnya
+    end
+end

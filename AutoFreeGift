@@ -1,0 +1,9 @@
+-- PlayTime Gift (Loop from 1 to 12)
+for i = 1, 12 do
+    local args = {
+        [1] = i -- Automatically cycles through 1 to 12
+    }
+    
+    game:GetService("ReplicatedStorage").Remotes.Misc.FreeGift:FireServer(unpack(args))
+    --wait(1) -- Optional: add a delay between firing each gift, adjust the time as needed
+end

@@ -1,0 +1,25 @@
+if game.PlaceId == 15846919378 then
+    print("Cocok Tanam Dan TP")
+    local function executeScripts(scripts)
+        for _, script in ipairs(scripts) do
+            local co = coroutine.create(function()
+                loadstring(game:HttpGet(script))()
+            end)
+            coroutine.resume(co)
+        end
+    end
+    
+    local scripts = {
+        "https://raw.githubusercontent.com/LocasTheBoys/efentedeh/refs/heads/main/AutoDailyClaim",
+        "https://raw.githubusercontent.com/LocasTheBoys/efentedeh/refs/heads/main/AutoFreeGift",
+        "https://raw.githubusercontent.com/LocasTheBoys/efentedeh/refs/heads/main/AutoSeasonPassClaim",
+        "https://raw.githubusercontent.com/LocasTheBoys/efentedeh/refs/heads/main/AutoSeasonPassClaim2",
+        "https://raw.githubusercontent.com/LocasTheBoys/efentedeh/refs/heads/main/AutoSeasonPassClaimClan"
+    }
+    
+    executeScripts(scripts)
+    print("Game ID cocok, script dijalankan.")
+else
+    -- Script ini hanya dijalankan jika game ID tidak cocok
+    print("Game ID tidak cocok, script tidak dijalankan.")
+end

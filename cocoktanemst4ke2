@@ -1,0 +1,82 @@
+task.wait(20)
+-- Konfigurasi Wave Detection
+local targetWaves = { "Wave 3/15", "Wave 5/15" }  -- Ganti dengan wave yang diinginkan
+local waitTimeWaveDetected = 5.5 -- Waktu tunggu dalam detik setelah wave terdeteksi
+local waitTimeTeleport = 2 -- Waktu tunggu dalam detik setelah teleportasi sebelum summon pet
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local PathWaveDetection = Player.PlayerGui.Top.Wave
+local executedWaves = {} -- Menyimpan status eksekusi untuk setiap wave
+
+-- Skrip 2: Konfigurasi Masang via path Koordinat
+local petName = "Funtime Freddy" -- Nama pet yang akan disummon
+
+-- Fungsi teleportasi
+local function teleportAndSummon(part1, part2)
+    local character = Player.Character or Player.CharacterAdded:Wait()
+
+    -- Memindahkan karakter ke part1 dan part2
+    character.HumanoidRootPart.CFrame = part1.CFrame
+    character.HumanoidRootPart.CFrame = part2.CFrame
+
+    -- Menentukan midpoint antara part1 dan part2, lalu memindahkan karakter ke midpoint tersebut
+    local finalMidpoint = (part1.Position + part2.Position) / 2
+    character.HumanoidRootPart.CFrame = CFrame.new(finalMidpoint)
+
+    -- Waktu tunggu setelah teleportasi sebelum summon pet
+    wait(waitTimeTeleport)
+
+    -- Mengirim sinyal "Reset" untuk StopSettings
+    local argsReset = {
+        [1] = "Reset"
+    }
+    game:GetService("ReplicatedStorage").Remotes.Misc.StopSettings:FireServer(unpack(argsReset))
+
+    -- Mengirim sinyal StopSettings berulang kali
+    for i = 1, 68 do
+        game:GetService("ReplicatedStorage").Remotes.Misc.StopSettings:FireServer()
+    end
+
+    -- Mengambil CFrame dari HumanoidRootPart pemain untuk summoning
+    local humanoidRootPartCFrame = character.HumanoidRootPart.CFrame
+
+    -- Mengirim sinyal untuk summon tower dengan pet yang sudah dikonfigurasi
+    local argsSummon = {
+        [1] = petName,
+        [2] = humanoidRootPartCFrame
+    }
+    game:GetService("ReplicatedStorage").Remotes.Towers.SummonTower:FireServer(unpack(argsSummon))
+end
+
+-- Menyiapkan bagian untuk teleportasi
+local path = workspace.Map:WaitForChild("Paths"):WaitForChild("1")
+local partList = {
+    {path:WaitForChild("2"), path:WaitForChild("Start")},
+    {path:WaitForChild("2"), path:WaitForChild("4")},--ini
+    {path:WaitForChild("1"), path:WaitForChild("3")},
+    {path:WaitForChild("2"), path:WaitForChild("Start")},
+    {path:WaitForChild("2"), path:WaitForChild("Start")},
+    {path:WaitForChild("2"), path:WaitForChild("4")},--ini
+    {path:WaitForChild("1"), path:WaitForChild("3")},
+    {path:WaitForChild("2"), path:WaitForChild("Start")}
+}
+
+-- Fungsi untuk mendeteksi wave dan menjalankan skrip 2
+local function detectWaveAndExecute(waveText)
+    if table.find(targetWaves, waveText) and not executedWaves[waveText] then
+        wait(waitTimeWaveDetected) -- Tunggu sesuai waktu yang ditentukan setelah wave terdeteksi
+
+        -- Melakukan teleportasi dan summon pet di setiap bagian yang ditentukan
+        for _, parts in ipairs(partList) do
+            teleportAndSummon(parts[1], parts[2])
+        end
+
+        executedWaves[waveText] = true -- Tandai wave ini telah dieksekusi
+    end
+end
+
+-- Menambahkan listener untuk mendeteksi perubahan teks di PathWaveDetection
+PathWaveDetection:GetPropertyChangedSignal("Text"):Connect(function()
+    local waveText = PathWaveDetection.Text
+    detectWaveAndExecute(waveText)
+end)

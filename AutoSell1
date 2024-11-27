@@ -1,0 +1,45 @@
+-- Konfigurasi Auto sell Funtime Foxy
+local targetWaves = { "Wave 3/15", "Wave 4/15" }  -- Ganti dengan wave yang diinginkan
+local targetUnitName = "Funtime Foxy"  -- Nama unit
+local waitTime = 7 -- Waktu tunggu dalam detik setelah wave terdeteksi
+
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local PathWaveDetection = Player.PlayerGui.Top.Wave
+local executedWaves = {} -- Menyimpan status eksekusi untuk setiap wave
+
+-- Fungsi untuk menjual pet
+local function sellPets()
+    local allSellUnits = {}
+    for _, unit in pairs(workspace.Towers:GetChildren()) do
+        if unit.Name == targetUnitName then
+            local primaryPart = unit:FindFirstChildWhichIsA("BasePart")
+            if primaryPart then
+                table.insert(allSellUnits, unit)
+            end
+        end
+    end
+    if #allSellUnits > 0 then
+        for _, unit in ipairs(allSellUnits) do
+            local SellArgs = {
+                [1] = unit
+            }
+            local success, err = pcall(function()
+                game:GetService("ReplicatedStorage").Remotes.Towers.Sell:FireServer(unpack(SellArgs))
+            end)
+            if not success then
+                warn("Sell failed for unit: " .. unit.Name .. " with error: " .. err)
+            end
+        end
+    end
+end
+
+-- Menambahkan listener untuk mendeteksi perubahan teks di PathWaveDetection
+PathWaveDetection:GetPropertyChangedSignal("Text"):Connect(function()
+    local waveText = PathWaveDetection.Text
+    if table.find(targetWaves, waveText) and not executedWaves[waveText] then
+        wait(waitTime) -- Tunggu sesuai waktu yang ditentukan
+        sellPets()
+        executedWaves[waveText] = true -- Tandai wave ini telah dieksekusi
+    end
+end)

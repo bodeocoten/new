@@ -1,0 +1,16 @@
+wait(3)
+local Players = game:GetService("Players")
+
+for i = 1, 1000 do
+    task.wait(5)
+    local Player = Players.LocalPlayer
+    local PathToYesButton = Player.PlayerGui.Top.SkipWave.Yes
+    local Connections = {"Activated", "MouseButton1Click", "MouseButton1Down"}
+    for _, connectionType in next, Connections do
+        if PathToYesButton[connectionType] then
+            for _, conn in next, getconnections(PathToYesButton[connectionType]) do
+                conn:Fire()
+            end
+        end
+    end
+end

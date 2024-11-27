@@ -1,0 +1,130 @@
+-- Konfigurasi 
+local targetMoney = 6000 -- Jumlah minimum uang untuk menjalankan skrip  
+local loopCount = 4 -- Jumlah pengulangan teleportasi dan summon pet 
+local petName = "Funtime Freddy" -- Nama pet yang akan disummon 
+local waitTimeBeforeCheck = 3 -- Waktu tunggu sebelum memulai pengecekan uang (dalam detik) 
+local waitTimeTeleport = 1.5 -- Waktu tunggu setelah teleportasi sebelum summon pet  
+local waitTimeBetweenTeleports = 2 -- Waktu tunggu sebelum teleportasi berikutnya 
+
+-- Pengaturan Auto Sell
+local targetUnitName = "Funtime Foxy" -- Nama unit yang akan dijual
+
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local PathMoneyDetection = Player.PlayerGui.Top.Money -- Mengambil objek TextLabel yang benar
+local partList = {} -- Siapkan list untuk menyimpan bagian teleportasi
+
+-- Menyiapkan bagian untuk teleportasi
+local path = workspace.Map:WaitForChild("Paths"):WaitForChild("1")
+partList = {
+    {path:WaitForChild("2"), path:WaitForChild("Start")},
+    {path:WaitForChild("1"), path:WaitForChild("3")},
+    {path:WaitForChild("2"), path:WaitForChild("4")},
+    {path:WaitForChild("2"), path:WaitForChild("Start")}
+}
+
+local hasExecuted = false -- Status untuk memantau apakah skrip telah dieksekusi
+
+-- Fungsi teleportasi dan summon pet
+local function teleportAndSummon(part1, part2)
+    local character = Player.Character or Player.CharacterAdded:Wait()
+
+    -- Memindahkan karakter ke part1
+    character.HumanoidRootPart.CFrame = part1.CFrame
+    
+    -- Menentukan midpoint antara part1 dan part2, lalu memindahkan karakter ke midpoint tersebut
+    local finalMidpoint = (part1.Position + part2.Position) / 2
+    character.HumanoidRootPart.CFrame = CFrame.new(finalMidpoint)
+
+    -- Waktu tunggu setelah teleportasi sebelum summon pet
+    wait(waitTimeTeleport)
+
+    -- Mengirim sinyal "Reset" untuk StopSettings
+    local argsReset = { [1] = "Reset" }
+    game:GetService("ReplicatedStorage").Remotes.Misc.StopSettings:FireServer(unpack(argsReset))
+
+    -- Mengirim sinyal StopSettings berulang kali
+    for i = 1, 68 do
+        game:GetService("ReplicatedStorage").Remotes.Misc.StopSettings:FireServer()
+    end
+
+    -- Mengambil CFrame dari HumanoidRootPart pemain untuk summoning
+    local humanoidRootPartCFrame = character.HumanoidRootPart.CFrame
+
+    -- Mengirim sinyal untuk summon tower dengan pet yang sudah dikonfigurasi
+    local argsSummon = { [1] = petName, [2] = humanoidRootPartCFrame }
+    game:GetService("ReplicatedStorage").Remotes.Towers.SummonTower:FireServer(unpack(argsSummon))
+
+    print("Summoned " .. petName .. " at location!") -- Pesan konfirmasi
+end
+
+-- Fungsi untuk auto sell
+local function sellPets()
+    local allSellUnits = {}
+    for _, unit in pairs(workspace.Towers:GetChildren()) do
+        if unit.Name == targetUnitName then
+            local primaryPart = unit:FindFirstChildWhichIsA("BasePart")
+            if primaryPart then
+                table.insert(allSellUnits, unit)
+            end
+        end
+    end
+
+    if #allSellUnits > 0 then
+        for _, unit in ipairs(allSellUnits) do
+            local sellArgs = { [1] = unit }
+            local success, err = pcall(function()
+                game:GetService("ReplicatedStorage").Remotes.Towers.Sell:FireServer(unpack(sellArgs))
+            end)
+            if not success then
+                warn("Sell failed for unit: " .. unit.Name .. " with error: " .. err)
+            end
+        end
+    end
+end
+
+-- Fungsi untuk memeriksa jumlah uang dan menjalankan auto sell dan summon pet
+local function checkMoneyAndExecute()
+    local moneyText = PathMoneyDetection.Text
+    -- Memastikan moneyText tidak nil dan memiliki format yang benar
+    if moneyText and moneyText:match("^%$%d[%d,]*$") then
+        -- Menghapus tanda "$" dan "," agar dapat dikonversi ke angka dengan benar
+        local numericText = moneyText:match("%$(%d[%d,]*)"):gsub(",", "")
+        local moneyAmount = tonumber(numericText) or 0
+        if moneyAmount >= targetMoney and not hasExecuted then
+            print("Money meets target. Running auto sell and summoning Funtime Freddy...")
+
+            -- Tandai bahwa eksekusi telah dilakukan
+            hasExecuted = true
+            
+            -- Jalankan auto sell
+            sellPets()
+
+            -- Teleportasi dan summon pet pada setiap bagian yang ditentukan
+            for _ = 1, loopCount do
+                for _, parts in ipairs(partList) do
+                    teleportAndSummon(parts[1], parts[2])
+                    wait(waitTimeBetweenTeleports) -- Tunggu sebelum teleportasi berikutnya
+                end
+            end
+
+            -- Hentikan pengecekan lebih lanjut dengan `break`
+            return -- Keluar dari fungsi setelah eksekusi selesai
+        end
+    else
+    end
+end
+
+-- Menambahkan listener untuk mendeteksi perubahan teks di PathMoneyDetection
+PathMoneyDetection:GetPropertyChangedSignal("Text"):Connect(function()
+    checkMoneyAndExecute() -- Memeriksa uang setiap kali teks berubah
+end)
+
+-- Loop untuk memeriksa jumlah uang secara berkala
+task.spawn(function()
+    wait(waitTimeBeforeCheck)
+    while true do
+        checkMoneyAndExecute()
+        task.wait(5)
+    end
+end)

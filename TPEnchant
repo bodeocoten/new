@@ -1,0 +1,11 @@
+--TP Enchant
+if game.PlaceId == 15846919378 then
+    wait(1) -- Tunggu 1 detik
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-1055.18, 245.01, -176.63) -- teleport ke posisi pertama
+    wait(1) -- Tunggu 1 detik sebelum teleportasi kedua
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-1066.11, 245.01, -174.01) -- teleport ke posisi kedua
+    print("Game ID cocok, skrip dijalankan.")
+else
+    -- Script ini hanya dijalankan jika game ID tidak cocok
+    print("Game ID tidak cocok, skrip tidak dijalankan.")
+end

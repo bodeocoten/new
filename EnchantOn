@@ -1,0 +1,32 @@
+-- Mengatur status enchant
+local isEnchantActive = true  -- Ganti dengan false jika ingin menonaktifkan
+
+-- Konfigurasi Enchant
+local enchantConfig = {
+    {"Damage1", isEnchantActive},
+    {"Damage2", isEnchantActive},
+    {"Damage3", isEnchantActive},
+    {"Range1", isEnchantActive},
+    {"Range2", isEnchantActive},
+    {"Range3", isEnchantActive},
+    {"Speed1", isEnchantActive},  -- sampai Speed3
+    {"Speed2", isEnchantActive},
+    {"Speed3", isEnchantActive},
+    {"BossKiller", isEnchantActive}  -- jika true, maka tidak akan ter enchant
+}
+
+-- Fungsi untuk memanggil Remote
+local function autoSkipEnchant(enchant)
+    local args = {
+        [1] = enchant[1],
+        [2] = enchant[2]
+    }
+    game:GetService("ReplicatedStorage").Remotes.Misc.AutoSkipEnchant:FireServer(unpack(args))
+end
+
+-- Menjalankan semua enchant dari konfigurasi
+for _, enchant in ipairs(enchantConfig) do
+    if enchant[2] then  -- Hanya menjalankan enchant yang aktif
+        autoSkipEnchant(enchant)
+    end
+end

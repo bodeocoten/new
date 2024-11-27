@@ -1,0 +1,69 @@
+wait(10)
+-- Konfigurasi
+local petName = "Nightguard Afton" -- Nama pet yang akan disummon, mudah diubah di sini
+local waitTimeTeleport = 1 -- Waktu tunggu setelah teleportasi sebelum summon pet
+local waitTimeBetweenTeleports = 1 -- Waktu tunggu sebelum teleportasi berikutnya
+local loopCount = 3 -- Jumlah pengulangan teleportasi dan summon pet
+
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+
+-- Fungsi teleportasi dan summon pet
+local function teleportAndSummon(part1, part2)
+    local character = Player.Character or Player.CharacterAdded:Wait()
+
+    -- Memindahkan karakter ke part1 dan part2
+    character.HumanoidRootPart.CFrame = part1.CFrame
+    character.HumanoidRootPart.CFrame = part2.CFrame
+
+    -- Menentukan midpoint antara part1 dan part2, lalu memindahkan karakter ke midpoint tersebut
+    local finalMidpoint = (part1.Position + part2.Position) / 2
+    character.HumanoidRootPart.CFrame = CFrame.new(finalMidpoint)
+
+    -- Waktu tunggu setelah teleportasi sebelum summon pet
+    task.wait(waitTimeTeleport)
+
+    -- Mengirim sinyal "Reset" untuk StopSettings
+    local argsReset = { [1] = "Reset" }
+    game:GetService("ReplicatedStorage").Remotes.Misc.StopSettings:FireServer(unpack(argsReset))
+
+    -- Mengirim sinyal StopSettings berulang kali
+    for i = 1, 68 do
+        game:GetService("ReplicatedStorage").Remotes.Misc.StopSettings:FireServer()
+    end
+
+    -- Mengambil CFrame dari HumanoidRootPart pemain untuk summoning
+    local humanoidRootPartCFrame = character.HumanoidRootPart.CFrame
+
+    -- Mengirim sinyal untuk summon tower dengan pet yang sudah dikonfigurasi
+    local argsSummon = { [1] = petName, [2] = humanoidRootPartCFrame }
+    game:GetService("ReplicatedStorage").Remotes.Towers.SummonTower:FireServer(unpack(argsSummon))
+end
+
+-- Menyiapkan bagian untuk teleportasi di dua jalur berbeda
+local path1 = workspace.Map:WaitForChild("Paths"):WaitForChild("1")
+local path2 = workspace.Map:WaitForChild("Paths"):WaitForChild("2")
+
+local partList1 = {
+    {path1:WaitForChild("2"), path1:WaitForChild("Start")},
+    {path1:WaitForChild("1"), path1:WaitForChild("3")},
+    {path1:WaitForChild("1"), path1:WaitForChild("2")}
+}
+
+local partList2 = {
+    {path2:WaitForChild("1"), path2:WaitForChild("3")},
+    {path2:WaitForChild("1"), path2:WaitForChild("3")}
+}
+
+-- Menjalankan teleportasi dan summon di setiap part dalam kedua jalur sesuai jumlah loopCount
+for i = 1, loopCount do
+    for _, parts in ipairs(partList2) do
+        teleportAndSummon(parts[1], parts[2])
+        task.wait(waitTimeBetweenTeleports)
+    end
+
+    for _, parts in ipairs(partList1) do
+        teleportAndSummon(parts[1], parts[2])
+        task.wait(waitTimeBetweenTeleports)
+    end
+end

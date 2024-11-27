@@ -1,0 +1,23 @@
+--print("vps 2")
+print("Full Script Is Running")
+local function executeScripts(scripts)
+    for _, script in ipairs(scripts) do
+        local co = coroutine.create(function()
+            loadstring(game:HttpGet(script))()
+        end)
+        coroutine.resume(co)
+    end
+end
+
+local scripts = {
+    "https://raw.githubusercontent.com/LocasTheBoys/efentedeh/refs/heads/main/AutoJoin2",
+    "https://raw.githubusercontent.com/LocasTheBoys/efentedeh/refs/heads/main/PlaceDetection7Fix",
+    "https://raw.githubusercontent.com/LocasTheBoys/efentedeh/refs/heads/main/Claim",
+    "https://raw.githubusercontent.com/LocasTheBoys/efentedeh/refs/heads/main/EqFredOnly",--delete bagian ini jika sudah auto win
+    "https://raw.githubusercontent.com/LocasTheBoys/efenprojekmatiktuga/refs/heads/main/LOWGRAPIK",
+    "https://raw.githubusercontent.com/LocasTheBoys/selah/main/AntiDC",
+    "https://raw.githubusercontent.com/LocasTheBoys/TheBoyss/main/FPSCAP",
+    "https://raw.githubusercontent.com/LocasTheBoys/efentedeh/refs/heads/main/hooking2All"
+}
+
+executeScripts(scripts)

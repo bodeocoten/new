@@ -1,0 +1,91 @@
+if game.PlaceId == 15846919378 then
+    wait(0.1)
+    -- Konfigurasi Auto Equip Pet
+    local petNames = { "Freddy" } -- Nama dasar pet
+    local inventoryPath = game:GetService("Players").LocalPlayer.PlayerGui.Inventory.InventoryFrame.HolderFrame
+    local enchants = { "Shiny%d", "Damage%d", "Range%d", "Speed%d", "BossKiller", "Withered", "PuppetsNightmare", "Bounded", "Shadow", "Vengeance" }
+    
+    -- Fungsi untuk cek apakah pet memiliki enchant
+    local function hasEnchant(petNameWithEnchant)
+        for _, enchant in ipairs(enchants) do
+            if string.match(petNameWithEnchant, enchant) then
+                return true
+            end
+        end
+        return false
+    end
+    
+    -- Fungsi untuk mengambil semua pet dengan enchant berdasarkan nama dasar
+    local function getPetsWithEnchant(petBaseNames)
+        local petsWithEnchant = {}
+        for _, petBaseName in ipairs(petBaseNames) do
+            for _, unit in pairs(inventoryPath.Units:GetChildren()) do
+                if string.find(unit.Name, petBaseName) and hasEnchant(unit.Name) then
+                    table.insert(petsWithEnchant, unit)
+                end
+            end
+        end
+        return petsWithEnchant
+    end
+    
+    -- Fungsi untuk mengambil semua pet normal tanpa enchant berdasarkan nama dasar
+    local function getNormalPets(petBaseNames)
+        local normalPets = {}
+        for _, petBaseName in ipairs(petBaseNames) do
+            for _, unit in pairs(inventoryPath.Units:GetChildren()) do
+                if string.find(unit.Name, petBaseName) and not hasEnchant(unit.Name) then
+                    table.insert(normalPets, unit)
+                end
+            end
+        end
+        return normalPets
+    end
+    
+    -- Fungsi untuk un-equip semua pet
+    local function unequipAllPets()
+        local args = {
+            [1] = "UnequipAll"
+        }
+        game:GetService("ReplicatedStorage").Remotes.Towers.Equip:FireServer(unpack(args))
+        print("Semua pet telah di-un-equip.")
+    end
+    
+    -- Fungsi utama untuk Auto Equip Pet
+    local function autoEquipPets()
+        local petsWithEnchant = getPetsWithEnchant(petNames)
+        
+        if #petsWithEnchant > 0 then
+            for _, petUnit in ipairs(petsWithEnchant) do
+                local petTowerID = petUnit.TowerID.Value
+                local args = { petTowerID }
+                game:GetService("ReplicatedStorage").Remotes.Towers.Equip:FireServer(unpack(args))
+                print("Pet dengan TowerID: " .. petTowerID .. " dan enchant dilengkapi:", petUnit.Name)
+                wait(1) -- Tambahkan jeda waktu jika perlu
+            end
+        end
+        
+        -- Selalu coba equip pet normal jika tidak ada pet dengan enchant atau selesai mengequip pet dengan enchant
+        local normalPets = getNormalPets(petNames)
+        if #normalPets > 0 then
+            for _, petUnit in ipairs(normalPets) do
+                local petTowerID = petUnit.TowerID.Value
+                local args = { petTowerID }
+                game:GetService("ReplicatedStorage").Remotes.Towers.Equip:FireServer(unpack(args))
+                print("Pet normal dengan TowerID: " .. petTowerID .. " dilengkapi:", petUnit.Name)
+                wait(1) -- Tambahkan jeda waktu jika perlu
+            end
+        else
+            print("Tidak ada pet normal yang cocok ditemukan di dalam tas.")
+        end
+    end
+    
+    -- Eksekusi un-equip semua pet sebelum melengkapi yang baru
+    unequipAllPets()
+    wait(1) -- Tambahkan jeda waktu jika perlu sebelum melengkapi pet
+    -- Jalankan fungsi auto equip
+    autoEquipPets()
+    print("Game ID cocok, script dijalankan.")
+else
+    -- Script ini hanya dijalankan jika game ID tidak cocok
+    print("Game ID tidak cocok, script tidak dijalankan.")
+end

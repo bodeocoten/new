@@ -1,0 +1,21 @@
+task.wait(120)
+
+local args = {
+    [1] = "Reset"
+}
+
+game:GetService("ReplicatedStorage").Remotes.Misc.StopSettings:FireServer(unpack(args))
+
+for i = 1, 68 do
+    game:GetService("ReplicatedStorage").Remotes.Misc.StopSettings:FireServer()
+end
+
+local player = game.Players.LocalPlayer
+local humanoidRootPartCFrame = player.Character.HumanoidRootPart.CFrame -- Mengambil CFrame dari HumanoidRootPart local player
+
+local args = {
+    [1] = "Bonnie",
+    [2] = humanoidRootPartCFrame
+}
+
+game:GetService("ReplicatedStorage").Remotes.Towers.SummonTower:FireServer(unpack(args))

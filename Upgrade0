@@ -1,0 +1,63 @@
+wait(15)
+-- Konfigurasi
+local targetWavesForUpgrade = { "Wave 9/15", "Wave 10/15" } -- Wave di mana upgrade diaktifkan
+local stopWave = "Wave 16/15" -- Wave di mana loop upgrade akan berhenti
+local petNameToUpgrade = "Freddy" -- Nama pet yang akan di-upgrade
+local checkInterval = 5 -- Interval waktu antar pengecekan (dalam detik)
+
+-- Path untuk mendeteksi wave
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local PathWaveDetection = Player.PlayerGui.Top.Wave
+
+-- Status untuk mengontrol apakah upgrade harus berlanjut
+local upgradeActive = false
+
+-- Fungsi untuk mengecek apakah wave saat ini dalam daftar target
+local function isWaveEligibleForUpgrade(currentWaveText)
+    return table.find(targetWavesForUpgrade, currentWaveText) ~= nil
+end
+
+-- Loop utama script upgrade
+while true do
+    local waveText = PathWaveDetection.Text
+
+    -- Aktifkan upgrade jika wave saat ini termasuk dalam target wave
+    if isWaveEligibleForUpgrade(waveText) then
+        upgradeActive = true
+    end
+
+    -- Hentikan upgrade jika wave saat ini mencapai stopWave
+    if waveText == stopWave then
+        upgradeActive = false
+    end
+
+    -- Jika upgrade diaktifkan, jalankan proses upgrade
+    if upgradeActive then
+        local allUpgradableUnits = {}
+        for _, unit in pairs(workspace.Towers:GetChildren()) do
+            if unit.Name == petNameToUpgrade then
+                local primaryPart = unit:FindFirstChildWhichIsA("BasePart")
+                if primaryPart then
+                    table.insert(allUpgradableUnits, unit)
+                end
+            end
+        end
+
+        if #allUpgradableUnits > 0 then
+            for _, unit in ipairs(allUpgradableUnits) do
+                local upgradeArgs = {
+                    [1] = unit
+                }
+                local success, err = pcall(function()
+                    game:GetService("ReplicatedStorage").Remotes.Towers.Upgrade:FireServer(unpack(upgradeArgs))
+                end)
+                if not success then
+                    warn("Upgrade failed for unit: " .. unit.Name .. " with error: " .. err)
+                end
+            end
+        end
+    end
+
+    wait(checkInterval) -- Delay antar loop
+end

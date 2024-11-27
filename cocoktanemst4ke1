@@ -1,0 +1,258 @@
+task.wait(15)
+-- Ini TP 1
+print("TP IKKI")
+-- Mengakses karakter pemain 
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+-- Menyiapkan bagian untuk teleportasi
+local path = workspace.Map:WaitForChild("Paths"):WaitForChild("1")
+local part1 = path:WaitForChild("2")
+local part2 = path:WaitForChild("Start")
+
+-- Memindahkan karakter ke part1 dan part2
+character.HumanoidRootPart.CFrame = part1.CFrame
+character.HumanoidRootPart.CFrame = part2.CFrame
+
+-- Menentukan midpoint antara part1 dan part2, lalu memindahkan karakter ke midpoint tersebut
+local finalMidpoint = (part1.Position + part2.Position) / 2
+character.HumanoidRootPart.CFrame = CFrame.new(finalMidpoint)
+
+-- Membuat garis neon antara midpoint dan part1
+local line = Instance.new("Part")
+line.Size = Vector3.new(0.2, 0.2, (finalMidpoint - part1.Position).Magnitude) -- Ukuran garis berdasarkan jarak
+line.Anchored = true
+line.CanCollide = false
+line.Color = Color3.new(1, 0, 0) -- Merah
+line.Material = Enum.Material.Neon
+line.CFrame = CFrame.new(finalMidpoint:Lerp(part1.Position, 0.5), part1.Position)
+line.Parent = workspace
+wait (1) -- Waktu tunggu wajib minimal 1 untuk dapat pet terletak
+
+
+-- Mengirim sinyal "Reset" untuk StopSettings
+local argsReset = {
+    [1] = "Reset"
+}
+game:GetService("ReplicatedStorage").Remotes.Misc.StopSettings:FireServer(unpack(argsReset))
+
+-- Mengirim sinyal StopSettings berulang kali
+for i = 1, 68 do
+    game:GetService("ReplicatedStorage").Remotes.Misc.StopSettings:FireServer()
+end
+
+-- Mengambil CFrame dari HumanoidRootPart pemain untuk summoning
+local humanoidRootPartCFrame = player.Character.HumanoidRootPart.CFrame
+
+-- Mengirim sinyal untuk summon tower "Funtime Foxy"
+local argsSummon = {
+    [1] = "Funtime Foxy",
+    [2] = humanoidRootPartCFrame
+}
+game:GetService("ReplicatedStorage").Remotes.Towers.SummonTower:FireServer(unpack(argsSummon))
+
+-- Ini TP 3
+-- Mengakses karakter pemain 
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+-- Menyiapkan bagian untuk teleportasi
+local path = workspace.Map:WaitForChild("Paths"):WaitForChild("1")
+local part1 = path:WaitForChild("1")
+local part2 = path:WaitForChild("3")
+
+-- Memindahkan karakter ke part1 dan part2
+character.HumanoidRootPart.CFrame = part1.CFrame
+character.HumanoidRootPart.CFrame = part2.CFrame
+
+-- Menentukan midpoint antara part1 dan part2, lalu memindahkan karakter ke midpoint tersebut
+local finalMidpoint = (part1.Position + part2.Position) / 2
+character.HumanoidRootPart.CFrame = CFrame.new(finalMidpoint)
+
+-- Membuat garis neon antara midpoint dan part1
+local line = Instance.new("Part")
+line.Size = Vector3.new(0.2, 0.2, (finalMidpoint - part1.Position).Magnitude) -- Ukuran garis berdasarkan jarak
+line.Anchored = true
+line.CanCollide = false
+line.Color = Color3.new(1, 0, 0) -- Merah
+line.Material = Enum.Material.Neon
+line.CFrame = CFrame.new(finalMidpoint:Lerp(part1.Position, 0.5), part1.Position)
+line.Parent = workspace
+wait (1) -- Waktu tunggu wajib minimal 1 untuk dapat pet terletak
+
+
+-- Mengirim sinyal "Reset" untuk StopSettings
+local argsReset = {
+    [1] = "Reset"
+}
+game:GetService("ReplicatedStorage").Remotes.Misc.StopSettings:FireServer(unpack(argsReset))
+
+-- Mengirim sinyal StopSettings berulang kali
+for i = 1, 68 do
+    game:GetService("ReplicatedStorage").Remotes.Misc.StopSettings:FireServer()
+end
+
+-- Mengambil CFrame dari HumanoidRootPart pemain untuk summoning
+local humanoidRootPartCFrame = player.Character.HumanoidRootPart.CFrame
+
+-- Mengirim sinyal untuk summon tower "Funtime Foxy"
+local argsSummon = {
+    [1] = "Funtime Foxy",
+    [2] = humanoidRootPartCFrame
+}
+game:GetService("ReplicatedStorage").Remotes.Towers.SummonTower:FireServer(unpack(argsSummon))
+
+-- Ini TP 2
+-- Mengakses karakter pemain 
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+-- Menyiapkan bagian untuk teleportasi
+local path = workspace.Map:WaitForChild("Paths"):WaitForChild("1")
+local part1 = path:WaitForChild("3")
+local part2 = path:WaitForChild("Start")
+
+-- Memindahkan karakter ke part1 dan part2
+character.HumanoidRootPart.CFrame = part1.CFrame
+character.HumanoidRootPart.CFrame = part2.CFrame
+
+-- Menentukan midpoint antara part1 dan part2, lalu memindahkan karakter ke midpoint tersebut
+local finalMidpoint = (part1.Position + part2.Position) / 2
+character.HumanoidRootPart.CFrame = CFrame.new(finalMidpoint)
+
+-- Membuat garis neon antara midpoint dan part1
+local line = Instance.new("Part")
+line.Size = Vector3.new(0.2, 0.2, (finalMidpoint - part1.Position).Magnitude) -- Ukuran garis berdasarkan jarak
+line.Anchored = true
+line.CanCollide = false
+line.Color = Color3.new(1, 0, 0) -- Merah
+line.Material = Enum.Material.Neon
+line.CFrame = CFrame.new(finalMidpoint:Lerp(part1.Position, 0.5), part1.Position)
+line.Parent = workspace
+wait (1) -- Waktu tunggu wajib minimal 1 untuk dapat pet terletak
+
+
+-- Mengirim sinyal "Reset" untuk StopSettings
+local argsReset = {
+    [1] = "Reset"
+}
+game:GetService("ReplicatedStorage").Remotes.Misc.StopSettings:FireServer(unpack(argsReset))
+
+-- Mengirim sinyal StopSettings berulang kali
+for i = 1, 68 do
+    game:GetService("ReplicatedStorage").Remotes.Misc.StopSettings:FireServer()
+end
+
+-- Mengambil CFrame dari HumanoidRootPart pemain untuk summoning
+local humanoidRootPartCFrame = player.Character.HumanoidRootPart.CFrame
+
+-- Mengirim sinyal untuk summon tower "Funtime Foxy"
+local argsSummon = {
+    [1] = "Funtime Foxy",
+    [2] = humanoidRootPartCFrame
+}
+game:GetService("ReplicatedStorage").Remotes.Towers.SummonTower:FireServer(unpack(argsSummon))
+
+-- Ini TP 2
+-- Mengakses karakter pemain 
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+-- Menyiapkan bagian untuk teleportasi
+local path = workspace.Map:WaitForChild("Paths"):WaitForChild("1")
+local part1 = path:WaitForChild("3")
+local part2 = path:WaitForChild("Start")
+
+-- Memindahkan karakter ke part1 dan part2
+character.HumanoidRootPart.CFrame = part1.CFrame
+character.HumanoidRootPart.CFrame = part2.CFrame
+
+-- Menentukan midpoint antara part1 dan part2, lalu memindahkan karakter ke midpoint tersebut
+local finalMidpoint = (part1.Position + part2.Position) / 2
+character.HumanoidRootPart.CFrame = CFrame.new(finalMidpoint)
+
+-- Membuat garis neon antara midpoint dan part1
+local line = Instance.new("Part")
+line.Size = Vector3.new(0.2, 0.2, (finalMidpoint - part1.Position).Magnitude) -- Ukuran garis berdasarkan jarak
+line.Anchored = true
+line.CanCollide = false
+line.Color = Color3.new(1, 0, 0) -- Merah
+line.Material = Enum.Material.Neon
+line.CFrame = CFrame.new(finalMidpoint:Lerp(part1.Position, 0.5), part1.Position)
+line.Parent = workspace
+wait (1) -- Waktu tunggu wajib minimal 1 untuk dapat pet terletak
+
+
+-- Mengirim sinyal "Reset" untuk StopSettings
+local argsReset = {
+    [1] = "Reset"
+}
+game:GetService("ReplicatedStorage").Remotes.Misc.StopSettings:FireServer(unpack(argsReset))
+
+-- Mengirim sinyal StopSettings berulang kali
+for i = 1, 68 do
+    game:GetService("ReplicatedStorage").Remotes.Misc.StopSettings:FireServer()
+end
+
+-- Mengambil CFrame dari HumanoidRootPart pemain untuk summoning
+local humanoidRootPartCFrame = player.Character.HumanoidRootPart.CFrame
+
+-- Mengirim sinyal untuk summon tower "Funtime Foxy"
+local argsSummon = {
+    [1] = "Funtime Foxy",
+    [2] = humanoidRootPartCFrame
+}
+game:GetService("ReplicatedStorage").Remotes.Towers.SummonTower:FireServer(unpack(argsSummon))
+
+wait(5)
+-- Ini TP 3
+-- Mengakses karakter pemain 
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+-- Menyiapkan bagian untuk teleportasi
+local path = workspace.Map:WaitForChild("Paths"):WaitForChild("1")
+local part1 = path:WaitForChild("1")
+local part2 = path:WaitForChild("3")
+
+-- Memindahkan karakter ke part1 dan part2
+character.HumanoidRootPart.CFrame = part1.CFrame
+character.HumanoidRootPart.CFrame = part2.CFrame
+
+-- Menentukan midpoint antara part1 dan part2, lalu memindahkan karakter ke midpoint tersebut
+local finalMidpoint = (part1.Position + part2.Position) / 2
+character.HumanoidRootPart.CFrame = CFrame.new(finalMidpoint)
+
+-- Membuat garis neon antara midpoint dan part1
+local line = Instance.new("Part")
+line.Size = Vector3.new(0.2, 0.2, (finalMidpoint - part1.Position).Magnitude) -- Ukuran garis berdasarkan jarak
+line.Anchored = true
+line.CanCollide = false
+line.Color = Color3.new(1, 0, 0) -- Merah
+line.Material = Enum.Material.Neon
+line.CFrame = CFrame.new(finalMidpoint:Lerp(part1.Position, 0.5), part1.Position)
+line.Parent = workspace
+wait (1) -- Waktu tunggu wajib minimal 1 untuk dapat pet terletak
+
+
+-- Mengirim sinyal "Reset" untuk StopSettings
+local argsReset = {
+    [1] = "Reset"
+}
+game:GetService("ReplicatedStorage").Remotes.Misc.StopSettings:FireServer(unpack(argsReset))
+
+-- Mengirim sinyal StopSettings berulang kali
+for i = 1, 68 do
+    game:GetService("ReplicatedStorage").Remotes.Misc.StopSettings:FireServer()
+end
+
+-- Mengambil CFrame dari HumanoidRootPart pemain untuk summoning
+local humanoidRootPartCFrame = player.Character.HumanoidRootPart.CFrame
+
+-- Mengirim sinyal untuk summon tower "Funtime Foxy"
+local argsSummon = {
+    [1] = "Funtime Foxy",
+    [2] = humanoidRootPartCFrame
+}
+game:GetService("ReplicatedStorage").Remotes.Towers.SummonTower:FireServer(unpack(argsSummon))
+

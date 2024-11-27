@@ -1,0 +1,47 @@
+--Jalan Panjang Tengah
+
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+local function getParts()
+    -- Attempt to get the first part from script 0
+    local part1 = workspace:FindFirstChild("Map") and workspace.Map:FindFirstChild("Paths"):FindFirstChild("1"):FindFirstChild("2")
+    -- Attempt to get the second part from script 1
+    local part2 = workspace:FindFirstChild("Map") and workspace.Map:FindFirstChild("Paths"):FindFirstChild("1"):FindFirstChild("1")
+    return part1, part2
+end
+
+for i = 1, 5 do -- Loop 5 times
+    local partsFound = false -- Flag to track if parts are found
+
+    while true do
+        -- Check if the map exists before attempting to get parts
+        if workspace:FindFirstChild("Map") then
+            local part1, part2 = getParts()
+
+            -- Check if both parts are detected
+            if part1 and part2 then
+                partsFound = true -- Set flag to true if parts are found
+
+                -- Calculate the middle position
+                local middlePosition = (part1.Position + part2.Position) / 2
+
+                -- Teleport the character to the middle position if not already there
+                if (humanoidRootPart.Position - middlePosition).magnitude > 0.1 then -- Check if not already at middle
+                    humanoidRootPart.CFrame = CFrame.new(middlePosition)
+                end
+            else
+                if not partsFound then
+                    print("Waiting for parts to be detected...") -- Log message when parts are not found
+                end
+            end
+        else
+            print("Waiting for the map to load...") -- Log message when map is not loaded
+        end
+
+        wait(1) -- Wait for a second before checking again
+    end
+
+    wait(5) -- Wait for 5 seconds before the next loop iteration
+end

@@ -1,0 +1,39 @@
+--map4ke1
+if game.PlaceId == 15860930970 then
+    wait(1)
+    -- Pilih Level
+    local args = {
+        [1] = "4",
+        [2] = 1,
+        [3] = 1
+    }
+    game:GetService("ReplicatedStorage").Remotes.Main.Vote:FireServer(unpack(args))
+    wait (1)
+    print("Cocok Tanam Dan TP")
+    local function executeScripts(scripts)
+        for _, script in ipairs(scripts) do
+            local co = coroutine.create(function()
+                loadstring(game:HttpGet(script))()
+            end)
+            coroutine.resume(co)
+        end
+    end
+    
+    local scripts = {
+        "https://raw.githubusercontent.com/LocasTheBoys/efentedeh/refs/heads/main/cocoktanemst4ke1",--fox
+        "https://raw.githubusercontent.com/LocasTheBoys/efentedeh/refs/heads/main/cocoktanemst4ke3",--Bonie
+        "https://raw.githubusercontent.com/LocasTheBoys/efentedeh/refs/heads/main/cocoktanemst4ke5",--fredd
+        "https://raw.githubusercontent.com/LocasTheBoys/efentedeh/refs/heads/main/AutoSkip2",
+        "https://raw.githubusercontent.com/LocasTheBoys/efentedeh/refs/heads/main/AutoSell1",
+        "https://raw.githubusercontent.com/LocasTheBoys/efentedeh/refs/heads/main/Upgrade4",
+        "https://raw.githubusercontent.com/LocasTheBoys/efentedeh/refs/heads/main/Upgrade5",
+        "https://raw.githubusercontent.com/LocasTheBoys/efentedeh/refs/heads/main/Upgrade6",
+        "https://raw.githubusercontent.com/LocasTheBoys/efentedeh/refs/heads/main/TryAgain"
+    }
+    
+    executeScripts(scripts)
+    print("Game ID cocok, script dijalankan.")
+else
+    -- Script ini hanya dijalankan jika game ID tidak cocok
+    print("Game ID tidak cocok, script tidak dijalankan.")
+end

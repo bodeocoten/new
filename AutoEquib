@@ -1,0 +1,27 @@
+wait(2)
+-- Konfigurasi Utama
+local delayBuyPresent = 1        -- Delay untuk beli present
+local delayOpenPresent = 2       -- Delay untuk membuka present
+local petName = "Nightguard Afton" -- Nama pet yang ingin dicek
+local presentName = "NightgaurdAftonPresent" -- Nama present yang akan dibuka
+local openQuantity = 1           -- Jumlah present yang akan dibuka
+
+-- Fungsi Auto Beli Present
+local function buyPresent()
+    game:GetService("ReplicatedStorage").Remotes.Misc.LimitedExclusivePack:FireServer()
+    print("Present dibeli.")
+end
+
+-- Fungsi Auto Open Present
+local function openPresent()
+    local args = { [1] = presentName, [2] = openQuantity }
+    game:GetService("ReplicatedStorage").Remotes.Misc.OpenPresent:FireServer(unpack(args))
+    print("Present dibuka.")
+end
+
+-- Rangkaian Proses Utama
+buyPresent()
+wait(delayBuyPresent)           -- Tunggu sebelum membuka present
+
+openPresent()
+wait(delayOpenPresent)          -- Tunggu sebelum mengequip pet

@@ -1,0 +1,7 @@
+for i = 1, 20 do 
+    local args = {
+        [1] = "Reward" .. i
+    }
+    game:GetService("ReplicatedStorage").Remotes.Clans.ClaimReward:FireServer(unpack(args))
+    wait(1.5) -- Optional delay between claims, adjust as needed
+end

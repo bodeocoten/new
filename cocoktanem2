@@ -1,0 +1,100 @@
+wait(3)--kotak bagus ini
+-- Mendapatkan posisi dari HumanoidRootPart local player
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+-- Menghitung koordinat baru untuk unit "Freddy"
+local radiusX = 7 -- Radius X untuk posisi acak (menjaga persegi panjang besar)
+local radiusZ = 20 -- Radius Z untuk posisi acak (menjaga persegi panjang besar)
+local usedPositions = {} -- Tabel untuk menyimpan posisi yang sudah digunakan
+
+-- Membuat visualisasi radius persegi panjang
+local visualIndicator = Instance.new("Part")
+visualIndicator.Size = Vector3.new(radiusX * 2, 0.1, radiusZ * 2) -- Ukuran persegi panjang
+visualIndicator.Position = humanoidRootPart.Position + Vector3.new(0, -0.5, 0) -- Ketinggian yang lebih rendah agar menyentuh lantai
+visualIndicator.Anchored = true
+visualIndicator.CanCollide = false
+visualIndicator.BrickColor = BrickColor.new("Bright blue")
+visualIndicator.Transparency = 0.7 -- Meningkatkan transparansi
+visualIndicator.Parent = workspace -- Menempatkan di dalam workspace
+
+-- Fungsi untuk memperbarui posisi persegi panjang mengikuti pemain
+local function updateVisualIndicator()
+    while true do
+        visualIndicator.Position = humanoidRootPart.Position + Vector3.new(0, -0.5, 0) -- Menyesuaikan ketinggian sedikit di bawah pemain
+        wait(0.1) -- Menunggu sebentar sebelum memperbarui lagi
+    end
+end
+
+-- Jalankan fungsi untuk memperbarui posisi persegi panjang
+spawn(updateVisualIndicator)
+
+-- Fungsi untuk mengecek apakah posisi sudah digunakan
+local function isPositionUsed(position)
+    for _, pos in pairs(usedPositions) do
+        if (pos - position).magnitude < 3 then -- Jarak minimum antara Freddy
+            return true
+        end
+    end
+    return false
+end
+
+-- Fungsi untuk memeriksa apakah posisi terlalu dekat dengan jalur
+local function isTooCloseToPath(position)
+    local paths = {
+        workspace.Map:WaitForChild("Paths"):WaitForChild("1"):WaitForChild("Start"),
+        workspace.Map:WaitForChild("Paths"):WaitForChild("1"):WaitForChild("1"),
+        workspace.Map:WaitForChild("Paths"):WaitForChild("1"):WaitForChild("2"),
+    }
+
+    for _, path in ipairs(paths) do
+        if (path.Position - position).magnitude < 5 then -- Jarak minimum dari path
+            return true
+        end
+    end
+
+    return false
+end
+
+-- Loop untuk menyummon unit "Freddy" tanpa batas
+while true do
+    -- Code ke 1: Menghentikan pengaturan
+    local args = {
+        [1] = "Reset"
+    }
+    game:GetService("ReplicatedStorage").Remotes.Misc.StopSettings:FireServer(unpack(args))
+
+    -- Code ke 2: Mengulang sebanyak 68 kali
+    for j = 1, 68 do
+        game:GetService("ReplicatedStorage").Remotes.Misc.StopSettings:FireServer()
+    end
+
+    -- Loop untuk mencoba spawn di posisi terdekat
+    for attempt = 1, 100 do -- Mencoba 100 kali untuk menemukan posisi yang valid
+        -- Menghasilkan posisi acak dalam area persegi panjang
+        local randomX = math.random(-radiusX, radiusX)
+        local randomZ = math.random(-radiusZ, radiusZ)
+        local newPosition = humanoidRootPart.Position + Vector3.new(randomX, 0, randomZ)
+
+        -- Memastikan posisi tidak digunakan dan tidak terlalu dekat dengan jalur
+        if not isPositionUsed(newPosition) and not isTooCloseToPath(newPosition) then
+            -- Menyimpan posisi yang digunakan
+            table.insert(usedPositions, newPosition)
+
+            -- Code ke 3: Menyummon unit "Freddy" di posisi baru
+            local argsSummon = {
+                [1] = "Freddy",
+                [2] = CFrame.new(newPosition) * CFrame.Angles(0, 0, 0)
+            }
+
+            game:GetService("ReplicatedStorage").Remotes.Towers.SummonTower:FireServer(unpack(argsSummon))
+            
+            -- Break setelah menemukan posisi valid
+            break
+        end
+    end
+
+    -- Delay sebelum menyummon Freddy berikutnya
+    wait(10) -- Ganti ini menjadi 10 detik sesuai permintaan Anda
+end

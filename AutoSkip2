@@ -1,0 +1,42 @@
+-- Konfigurasi
+local targetWavesToDisableSkip = { "Wave 1/15", "Wave 2/15", "Wave 3/15"} -- Waves yang ingin menonaktifkan auto skip
+local waitTimeBeforeCheck = 3 -- Waktu tunggu sebelum memulai pengecekan wave (dalam detik)
+
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local PathWaveDetection = Player.PlayerGui.Top.Wave
+local PathToYesButton = Player.PlayerGui.Top.SkipWave.Yes
+local Connections = {"Activated", "MouseButton1Click", "MouseButton1Down"}
+
+-- Fungsi untuk menekan tombol "Yes" pada auto skip
+local function autoSkip()
+    for _, connectionType in next, Connections do
+        if PathToYesButton[connectionType] then
+            for _, conn in next, getconnections(PathToYesButton[connectionType]) do
+                conn:Fire()
+            end
+        end
+    end
+end
+
+-- Menambahkan listener untuk mendeteksi perubahan teks di PathWaveDetection
+PathWaveDetection:GetPropertyChangedSignal("Text"):Connect(function()
+    local waveText = PathWaveDetection.Text
+
+    -- Cek jika saat ini tidak berada pada wave yang menonaktifkan auto skip
+    if not table.find(targetWavesToDisableSkip, waveText) then
+        autoSkip() -- Menjalankan auto skip jika tidak berada pada wave yang di-disable
+    end
+end)
+
+-- Loop untuk menekan tombol auto skip secara berkala jika kondisi terpenuhi
+task.spawn(function()
+    wait(waitTimeBeforeCheck) -- Tunggu sebelum memulai auto skip
+    while true do
+        local waveText = PathWaveDetection.Text
+        if not table.find(targetWavesToDisableSkip, waveText) then
+            autoSkip() -- Jalankan auto skip jika wave saat ini tidak dalam daftar untuk menonaktifkan skip
+        end
+        task.wait(5) -- Tunggu beberapa detik sebelum mengecek kembali
+    end
+end)

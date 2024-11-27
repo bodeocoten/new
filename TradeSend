@@ -1,0 +1,131 @@
+wait(10)
+print("TRADE")
+-- Konfigurasi Trade
+local targetUser = "C4trynaRobloxEletori" -- Nama user yang ingin Anda trade
+local petNames = { "Nightguard Afton", "Funtime Freddy" } -- Daftar nama pet dasar tanpa enchant, nil jika tidak ada pet
+local useMaxPetQuantity = true -- Gunakan jumlah maksimum pet (true) atau jumlah tertentu (false)
+local petQuantity = 1 -- Jumlah pet yang ingin Anda trade (jika useMaxPetQuantity adalah false)
+local itemName = "Souls" -- Nama item yang ingin Anda trade dari tas
+local useMaxItemQuantity = true -- Gunakan jumlah maksimum item (true) atau jumlah tertentu (false)
+local itemQuantity = 10 -- Jumlah item yang ingin Anda trade (jika useMaxItemQuantity adalah false)
+local waitTime = 5 -- Waktu tunggu (dalam detik) antara setiap langkah
+
+-- Pengaturan path inventory
+local localPlayer = game:GetService("Players").LocalPlayer
+local inventoryPath = localPlayer.PlayerGui.Inventory.InventoryFrame.HolderFrame
+
+-- Enchants yang perlu diperhatikan
+local enchants = { "Damage%d", "Range%d", "Speed%d", "BossKiller", "Withered", "PuppetsNightmare", "Bounded", "Shadow", "Vengeance" }
+
+-- Fungsi untuk cek apakah pet memiliki enchant
+local function hasEnchant(petNameWithEnchant)
+    for _, enchant in ipairs(enchants) do
+        if string.match(petNameWithEnchant, enchant) then
+            return true
+        end
+    end
+    return false
+end
+
+-- Fungsi untuk mengambil semua pet yang memiliki enchant berdasarkan nama dasar
+local function getPetsWithEnchant(petBaseNames)
+    local petsWithEnchant = {}
+    for _, petBaseName in ipairs(petBaseNames) do
+        for _, unit in pairs(inventoryPath.Units:GetChildren()) do
+            if string.find(unit.Name, petBaseName) and hasEnchant(unit.Name) then
+                table.insert(petsWithEnchant, unit)
+            end
+        end
+    end
+    return petsWithEnchant
+end
+
+-- Fungsi untuk mendapatkan jumlah maksimum pet yang tersedia
+local function getMaxPetQuantity(petUnit)
+    if petUnit then
+        local petInfo = petUnit.Info
+        local maxQuantity = tonumber(string.match(petInfo.Text, "x(%d+)")) or 0
+        return maxQuantity
+    end
+    return 0
+end
+
+-- Fungsi untuk mengambil jumlah maksimum item dari tas
+local function getMaxItemQuantity(itemName)
+    local itemInfoText = inventoryPath.Items[itemName].Info.Text
+    local maxQuantity = tonumber(string.match(itemInfoText, "x(%d+)")) or 0
+    return maxQuantity
+end
+
+-- Fungsi untuk menambahkan pet ke trade
+local function addPetToTrade(petTowerID, quantity)
+    if petTowerID and quantity > 0 then
+        local args = { "Add", petTowerID, quantity }
+        game:GetService("ReplicatedStorage").Remotes.Trading.Trade:FireServer(unpack(args))
+        print("Pet dengan TowerID: " .. petTowerID .. " ditambahkan ke trade, jumlah: " .. quantity)
+    end
+end
+
+-- Fungsi untuk menambahkan item ke trade
+local function addItemToTrade(itemName, quantity)
+    if quantity > 0 then
+        local args = { "Add", itemName, quantity }
+        game:GetService("ReplicatedStorage").Remotes.Trading.Trade:FireServer(unpack(args))
+        print("Item " .. itemName .. " ditambahkan ke trade, jumlah: " .. quantity)
+    end
+end
+
+-- Fungsi untuk mengirim trade request
+local function sendTradeRequest(targetUser)
+    local args = { targetUser }
+    game:GetService("ReplicatedStorage").Remotes.Trading.Send:FireServer(unpack(args))
+    print("Trade request dikirim ke: " .. targetUser)
+end
+
+-- Fungsi untuk menerima trade setelah item ditambahkan
+local function acceptTrade()
+    local args = { "Accept" }
+    game:GetService("ReplicatedStorage").Remotes.Trading.Trade:FireServer(unpack(args))
+    print("Trade diterima. Item dikirim ke " .. targetUser)
+    wait(7)
+end
+
+-- Fungsi utama untuk auto trade
+local function autoTrade()
+    while true do
+        -- Ambil jumlah item yang tersedia
+        local itemQuantityToTrade = useMaxItemQuantity and getMaxItemQuantity(itemName) or itemQuantity
+
+        -- Jika tidak ada item lagi, hentikan trade
+        if itemQuantityToTrade == 0 then
+            print("Item " .. itemName .. " habis. Trade dihentikan.")
+            break
+        end
+
+        -- Kirim trade request ke target
+        sendTradeRequest(targetUser)
+        wait(waitTime)
+
+        -- Tambahkan pet ke trade jika ada
+        if petNames then
+            local petsWithEnchant = getPetsWithEnchant(petNames)
+            for _, petUnit in ipairs(petsWithEnchant) do
+                local petTowerID = petUnit.TowerID.Value
+                local petQuantityToTrade = useMaxPetQuantity and getMaxPetQuantity(petUnit) or petQuantity
+                addPetToTrade(petTowerID, petQuantityToTrade)
+                wait(waitTime)
+            end
+        end
+
+        -- Tambahkan item ke trade
+        addItemToTrade(itemName, itemQuantityToTrade)
+        wait(waitTime)
+
+        -- Terima trade setelah item ditambahkan
+        acceptTrade()
+        wait(waitTime)
+    end
+end
+
+-- Jalankan autoTrade
+autoTrade()

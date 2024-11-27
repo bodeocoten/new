@@ -1,0 +1,50 @@
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+-- Fungsi untuk mendapatkan parts dari script 1
+local function getParts()
+    local part3 = workspace:FindFirstChild("Map") and workspace.Map:FindFirstChild("Paths"):FindFirstChild("3"):FindFirstChild("3")
+    local part4 = workspace:FindFirstChild("Map") and workspace.Map:FindFirstChild("Paths"):FindFirstChild("3"):FindFirstChild("4")
+    return part3, part4
+end
+
+-- Fungsi teleportasi ke midpoint dari part3 dan part4
+local function teleportToMidpoint()
+    local part3 = workspace.Map.Paths["3"]["3"]
+    local part4 = workspace.Map.Paths["3"]["4"]
+    local part1 = workspace.Map.Paths["3"]["1"]
+
+    -- Hitung midpoint dan finalMidpoint
+    local midpoint = (part3.Position + part4.Position) / 2
+    local finalMidpoint = (midpoint + part1.Position) / 2
+
+    -- Teleport ke finalMidpoint
+    humanoidRootPart.CFrame = CFrame.new(finalMidpoint)
+end
+
+-- Loop teleportasi hanya 3 kali
+for i = 1, 3 do
+    local partsFound = false -- Flag untuk mendeteksi part
+
+    -- Loop menunggu part terdeteksi
+    while not partsFound do
+        -- Cek apakah Map ada dan part3 serta part4 ditemukan
+        if workspace:FindFirstChild("Map") then
+            local part3Detected, part4Detected = getParts()
+
+            if part3Detected and part4Detected then
+                partsFound = true -- Jika part ditemukan, flag menjadi true
+                teleportToMidpoint() -- Teleportasi ke finalMidpoint
+            else
+                print("Waiting for parts to be detected...") -- Jika part belum ditemukan
+            end
+        else
+            print("Waiting for the map to load...") -- Jika Map belum ter-load
+        end
+
+        wait(1) -- Tunggu 1 detik sebelum memeriksa lagi
+    end
+
+    wait(5) -- Tunggu 5 detik sebelum loop berikutnya
+end
