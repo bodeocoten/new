@@ -1,7 +1,7 @@
 if game.PlaceId == 15846919378 then
     wait(2)
     -- Konfigurasi Auto Equip Pet
-    local petNames = { "Nightguard Afton", "Funtime Freddy", "Tangle", "Clowntrap", "Dreadbear" } -- Nama dasar pet
+    local petNames = { "ITS ME", "Duelist Puppet", "Tarnished Fredbear" } -- Nama dasar pet
     local inventoryPath = game:GetService("Players").LocalPlayer.PlayerGui.Inventory.InventoryFrame.HolderFrame
     local enchants = { "Damage%d", "Range%d", "Speed%d", "BossKiller", "Withered", "PuppetsNightmare", "Bounded", "Shadow", "Vengeance" }
     
