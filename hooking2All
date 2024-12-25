@@ -1,6 +1,6 @@
 wait(3)
 -- Masukkan webhook URL di sini untuk memudahkan penggantian VPS 2
-local webhookUrl = 'https://discord.com/api/webhooks/1288830007493267536/nUgSjjO2NJedHblKr3WdvdUNoBBoZUESy8cs25e59lAaz4LqIcUNhsH0TndNE2e5qFke'
+local webhookUrl = 'https://discord.com/api/webhooks/1321423942199541812/-ldJZmx9wDafCqY-eeMR14WFCbQaiYeeNGHF3xZZAJ0xqMGEohv2-9wuFciEbhhYGyKs'
 
 -- Periksa apakah game ID cocok
 if game.PlaceId == 15860930970 then
