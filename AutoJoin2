@@ -1,25 +1,64 @@
--- Auto Lift 2 - Teleport Loop Every 15s
+-- Auto Join Game
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
--- Toạ độ teleport
-local targetPosition1 = Vector3.new(70.24960327148438, 8.365525245666504, 150.01046752929688)
-local targetPosition2 = Vector3.new(36.24357223510742, 8.440408706665039, 120.19123077392578)
+-- Toạ độ mục tiêu đã thay đổi
+local targetPosition1 = Vector3.new(35.41082763671875, 8.224825859069824, 99.2252197265625)
+local targetPosition2 = Vector3.new(35.41082763671875, 8.224825859069824, 99.2252197265625)
 
-while true do
-    -- Kiểm tra xem nhân vật đã tải chưa
-    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        -- Teleport đến vị trí 1
-        LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(targetPosition1)
-        wait(1)  -- Chờ 1 giây
-        
-        -- Teleport đến vị trí 2
-        LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(targetPosition2)
-        print("Đã teleport thành công!")
-    else
-        print("Không tìm thấy nhân vật hoặc HumanoidRootPart!")
+-- Vị trí teleport cho Opsi 1
+local teleportPosition1_1 = CFrame.new(70.24960327148438, 8.365525245666504, 150.01046752929688)
+local teleportPosition1_2 = CFrame.new(36.24357223510742, 8.440408706665039, 120.19123077392578)
+
+-- Vị trí teleport cho Opsi 2
+local teleportPosition2_1 = CFrame.new(70.24960327148438, 8.365525245666504, 150.01046752929688)
+local teleportPosition2_2 = CFrame.new(36.24357223510742, 8.440408706665039, 120.19123077392578)
+
+-- Cek apakah pemain berada di game dengan ID tertentu
+if game.PlaceId == 15846919378 then
+    while true do
+        -- Pastikan karakter sudah ada và HumanoidRootPart hợp lệ
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            -- Dapatkan posisi pemain
+            local playerPosition = LocalPlayer.Character.HumanoidRootPart.Position
+            
+            -- Debug: Tampilkan vị trí của pemain
+            print("Posisi Pemain:", playerPosition)
+
+            -- Periksa jika pemain sudah berada tại target Opsi 1 hoặc Opsi 2
+            if (playerPosition - targetPosition1).magnitude <= 1 or (playerPosition - targetPosition2).magnitude <= 1 then
+                print("Pemain sudah mencapai salah satu target, keluar dari loop.")
+                break -- Keluar khỏi vòng lặp
+            end
+
+            -- Nếu không berada tại target, thực hiện teleport Opsi 1
+            LocalPlayer.Character.HumanoidRootPart.CFrame = teleportPosition1_1
+            wait(1)  -- Chờ 1 giây
+            LocalPlayer.Character.HumanoidRootPart.CFrame = teleportPosition1_2
+            wait(1)  -- Chờ 1 giây
+            
+            -- Sau khi teleport Opsi 1, kiểm tra lại vị trí pemain
+            playerPosition = LocalPlayer.Character.HumanoidRootPart.Position
+            if (playerPosition - targetPosition1).magnitude <= 1 or (playerPosition - targetPosition2).magnitude <= 1 then
+                print("Pemain sudah mencapai salah satu target setelah Opsi 1, keluar dari loop.")
+                break -- Keluar khỏi vòng lặp
+            end
+
+            -- Thực hiện teleport Opsi 2
+            LocalPlayer.Character.HumanoidRootPart.CFrame = teleportPosition2_1
+            wait(1)  -- Chờ 1 giây
+            LocalPlayer.Character.HumanoidRootPart.CFrame = teleportPosition2_2
+            wait(1)  -- Chờ 1 giây
+
+            -- Sau khi teleport Opsi 2, kiểm tra lại vị trí pemain
+            playerPosition = LocalPlayer.Character.HumanoidRootPart.Position
+            if (playerPosition - targetPosition1).magnitude <= 1 or (playerPosition - targetPosition2).magnitude <= 1 then
+                print("Pemain sudah mencapai salah satu target setelah Opsi 2, keluar dari loop.")
+                break -- Keluar khỏi vòng lặp
+            end
+        end
+
+        -- Chờ trước khi kiểm tra lại
+        wait(0.5)  -- Chờ 0.5 giây trước khi kiểm tra lại
     end
-    
-    -- Chờ 15 giây trước khi lặp lại
-    wait(15)
 end
