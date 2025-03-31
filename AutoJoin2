@@ -1,4 +1,4 @@
--- Auto Lift 2 - Teleport One Time
+-- Auto Lift 2 - Teleport Loop Every 15s
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
@@ -6,15 +6,20 @@ local LocalPlayer = Players.LocalPlayer
 local targetPosition1 = Vector3.new(70.24960327148438, 8.365525245666504, 150.01046752929688)
 local targetPosition2 = Vector3.new(36.24357223510742, 8.440408706665039, 120.19123077392578)
 
--- Kiểm tra xem nhân vật đã tải chưa
-if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-    -- Teleport đến vị trí 1
-    LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(targetPosition1)
-    wait(1)  -- Chờ 1 giây
+while true do
+    -- Kiểm tra xem nhân vật đã tải chưa
+    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        -- Teleport đến vị trí 1
+        LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(targetPosition1)
+        wait(1)  -- Chờ 1 giây
+        
+        -- Teleport đến vị trí 2
+        LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(targetPosition2)
+        print("Đã teleport thành công!")
+    else
+        print("Không tìm thấy nhân vật hoặc HumanoidRootPart!")
+    end
     
-    -- Teleport đến vị trí 2
-    LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(targetPosition2)
-    print("Đã teleport thành công!")
-else
-    print("Không tìm thấy nhân vật hoặc HumanoidRootPart!")
+    -- Chờ 15 giây trước khi lặp lại
+    wait(15)
 end
